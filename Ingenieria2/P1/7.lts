@@ -1,0 +1,12 @@
+//Una maquina expendedora de bebidas cobra 15c por una lata de gaseosas. La m´aquina
+//acepta monedas de 5c, 10c, y 20c, y da vuelto. Modele la m´aquina como un proceso FSP.
+MAQUINA = MAQUINA[0],
+
+MAQUINA[i:0..30] = (
+    when(i<15) intro5 -> MAQUINA[i+5]
+   	|when(i<15) intro10 -> MAQUINA[i+10]
+    |when(i<15) intro20 -> MAQUINA[i+20]
+    |when(i>=15) extraer_bebida -> devolver[i-15] -> MAQUINA[0]).
+
+
+//HAY ALGO QUE ESTA MAL Y ME CANSE DE BUSCAR

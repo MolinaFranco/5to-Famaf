@@ -1,0 +1,13 @@
+const N = 2
+range T = 0..N
+set VarAlpha = {value.{read[T],write[T],acquire,release}}
+
+VAR = VAR[0],
+VAR[i:0..N] = (read[i] -> VAR[i] 
+			|write[j:0..N] -> VAR[j]) + VarAlpha.
+
+
+TEST = (write[2] -> read[2] -> write[1] -> write[0] -> read[0] -> STOP).
+||PARA = (VAR || TEST).
+
+

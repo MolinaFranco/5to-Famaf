@@ -1,0 +1,19 @@
+// Considere una radio FM con tres controles. Uno es un interruptor on/off, que enciende
+// el aparato o lo apaga. Los otros controles controlan la sintonizacion; estos son dos botones scan y
+// reset. Cuando la radio se enciende o el boton reset se apreta, la radio se sintoniza en la frecuencia
+// mas alta de la banda (es decir, 108Mhz). Cuando se presiona scan, la radio empieza a buscar una
+// estacion, bajando hacia la frecuencia mas baja de la banda (88Mhz); se frena cuando encuentra una
+// estacion o cuando llega la banda mas baja, y si se vuelve a apretar scan, continua la busqueda en
+// forma descendente. Modele la radio como un proceso FSP.
+
+//range BANDA = 88..108
+const MAX = 89
+const MIN = 88
+range BANDA = MIN..MAX
+RADIO = (on -> RADIO[MAX]),
+//RADIO[x:BANDA] = (reset -> RESET | scan -> SCAN[x] | off -> RADIO),
+RADIO[x:BANDA] = (reset -> RADIO[MAX] | scan -> SCAN[x] | off -> RADIO),
+RESET = (mhz108 -> RADIO[MAX]),
+SCAN[x:BANDA] = (when (x>MIN+1) searching -> SCAN[x-1] | found -> RADIO[x]
+				|when (x==MIN+1) low -> RADIO[MIN]
+				|when (x==MIN) reset -> RESET).

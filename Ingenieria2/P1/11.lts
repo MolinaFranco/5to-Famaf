@@ -1,0 +1,18 @@
+//Ejercicio 11.. Considere una c´elula de producci´on industrial, en la cual se procesan objetos, realizando
+//un prensado de los mismos. Los objetos que se reciben son de cierto tipo A, y llegan a trav´es de una
+//cinta transportadora. Al llegar el primer elemento de la cinta a la posici´on de extracci´on, la cinta se
+//para. Luego, un brazo mec´anico levanta el elemento de la cinta y lo lleva a la prensa (la cual debe
+//estar desocupada), para su prensado. Luego del prensado, otro brazo mec´anico extrae el elemento de
+//la prensa y lo deposita en la salida de la c´elula. Modele la c´elula de producci´on como un proceso FSP.
+
+const N = 1 //cantidad de la cinta
+//9
+CINTA = (ingreso -> CINTA[1]),
+CINTA[i:0..N] = (when (i>0) levantar1 -> CINTA[i-1]
+				|when (i<N) ingreso -> CINTA[i+1]).
+
+BRAZO1 = (levantar1 -> soltar1 -> BRAZO1).
+PRENSA = (soltar1 -> comprimir -> levantar2 -> PRENSA).
+BRAZO2 = (levantar2 -> soltar2 -> BRAZO2).
+
+||CELULA = (CINTA || BRAZO1 || BRAZO2 || PRENSA).
