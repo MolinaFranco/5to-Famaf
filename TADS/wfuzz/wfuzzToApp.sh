@@ -1,7 +1,6 @@
 # Rutas Ocultas:
 wfuzz -c -w SecLists/Discovery/Web-Content/common.txt -u http://localhost:5000/FUZZ --sc 200,403
 
-
 # Descubrimiento de Archivos
 wfuzz -c -w SecLists/Discovery/Web-Content/raft-small-files.txt -u http://localhost:5000/FUZZ.bak --sc 200
 

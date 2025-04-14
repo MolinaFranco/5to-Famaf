@@ -1,0 +1,19 @@
+const N = 1 //lectores
+const M = 1 // escritores
+const K = 1 // max acces
+
+LECTOR = ( aquireRead -> releaseRead -> LECTOR ).
+ESCRITOR = (
+    aquireRead -> releaseRead -> ESCRITOR
+    |acquireWrite -> releaseWrite -> ESCRITOR
+).
+
+RECURSO = RECURSO[0][0],
+RESCURSO[i:1..N][j:0..1] = (
+    when i<N && j==0 aquireRead -> RECURSO[i+1][j]
+    | when i>0 releaseRead -> RECURSO[i-1][j]
+    | when i==0 && j==0 acquireWrite -> RECURSO[i][j+1]
+    | when j==1 releaseWrite -> RECURSO[i][j-1]
+).
+
+||SYSTEM = (escritor[1..M]:ESCRITOR || lector[1..N]:LECTOR || RECURSO).

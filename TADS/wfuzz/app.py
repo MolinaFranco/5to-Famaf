@@ -55,7 +55,7 @@ def catch_all(path):
         return redirect("/login")
 
     elif path == "admin":
-        return "403 Prohibido", 403
+        return "404 Prohibido", 403
 
     elif path == "secret":
         return "Nada que ver aquí", 404

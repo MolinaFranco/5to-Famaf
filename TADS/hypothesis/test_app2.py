@@ -9,15 +9,13 @@ def client():
 
 
 valid_emails = st.emails()
-valid_passwords = st.text(min_size=6, max_size=20) 
+valid_passwords = st.text(min_size=6, max_size=20)
 valid_birthdates = st.dates(min_value=date(1900, 1, 1), max_value=date.today()).map(
     lambda d: d.isoformat()
 )
 
 invalid_passwords = st.text()
-invalid_birthdates = st.dates().map(
-    lambda d: d.isoformat()
-)
+invalid_birthdates = st.dates().map(lambda d: d.isoformat())
 
 
 @given(email=valid_emails, password=valid_passwords, birthdate=valid_birthdates)
@@ -47,6 +45,7 @@ def test_register_invalid_inputs(email, password, birthdate):
 # fechas futuras
 from datetime import timedelta
 
+
 @given(
     email=valid_emails,
     password=valid_passwords,
@@ -64,6 +63,7 @@ def test_future_birthdate_rejected(email, password, birthdate):
 from hypothesis import given
 from hypothesis.strategies import composite
 
+
 # todo el JSON de una
 @composite
 def user_payload(draw):
@@ -75,21 +75,21 @@ def user_payload(draw):
 
 @composite
 def weak_user_payload(draw):
-    email_username = draw(st.text(min_size=3, max_size=10).filter(lambda x: x.isalnum()))
+    email_username = draw(
+        st.text(min_size=3, max_size=10).filter(lambda x: x.isalnum())
+    )
     domain = draw(st.sampled_from(["hotmail.com", "yahoo.com", "mail.com"]))
     email = f"{email_username}@{domain}"
-    
+
     # Password que incluye el username
-    password_suffix = draw(st.text(min_size=2, max_size=6))
+    password_suffix = draw(st.text(min_size=6, max_size=6))
     password = f"{email_username}{password_suffix}"
-    
-    birthdate = draw(st.dates(min_value=date(1900, 1, 1), max_value=date.today())).isoformat()
-    
-    return {
-        "email": email,
-        "password": password,
-        "birthdate": birthdate
-    }
+
+    birthdate = draw(
+        st.dates(min_value=date(1900, 1, 1), max_value=date.today())
+    ).isoformat()
+
+    return {"email": email, "password": password, "birthdate": birthdate}
 
 
 @given(payload=weak_user_payload())
