@@ -1,0 +1,13 @@
+PRESS = (available -> press -> ready -> PRESS).
+
+ARM = (move -> ARM).
+
+BELT = (to_extraction  -> stop -> ready ->  to_exit -> BELT).
+
+
+||PRODUCTION = (
+    belt: BELT || arm1: ARM || arm2: ARM || press: PRESS
+)/{
+    move_to_press/{arm1.move, belt.stop, press.available},
+    move_to_belt/{arm2.move, belt.ready, press.ready}
+}.

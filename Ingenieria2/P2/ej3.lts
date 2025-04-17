@@ -1,0 +1,18 @@
+const N = 3 //cantidad de asientos
+const T = 2 //cantidad de terminales
+
+COMPUTADORA = 
+TERMINAL = (
+    consultar[i: 0..N] -> libre -> 
+        (reservar[i] -> TERMINAL 
+        |TERMINAL)
+    | consultar[i: 0..N] -> ocupado[i] -> TERMINAL
+).
+
+EMPLEADOS = (
+    consultar[i: 0..N]
+    |reservar[i: 0..N]
+)
+
+// NO SE PUEDE SERVAR MAS DE UNA VEZ EL MISMO ASIENTO
+
