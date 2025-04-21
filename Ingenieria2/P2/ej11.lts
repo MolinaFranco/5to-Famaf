@@ -1,0 +1,12 @@
+// Muestre que los siguientes procesos son (fuertemente) bisimilares
+
+P = ( a -> ( b -> c -> P
+    | b -> c -> P )
+).
+
+Q = ( a -> b -> R
+    | a -> b -> R ),
+
+R = ( c -> Q ).
+
+ 
