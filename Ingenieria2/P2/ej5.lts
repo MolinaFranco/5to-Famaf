@@ -1,16 +1,18 @@
-//Dise˜ne y modele en FSP un protocolo de comunicaci´on que permita a un proceso pro-
-// ductor y un proceso consumidor comunicarse a trav´es de un canal asincr´onico con un n´umero m´aximo
+//Disene y modele en FSP un protocolo de comunicacion que permita a un proceso pro-
+// ductor y un proceso consumidor comunicarse a traves de un canal asincr´onico con un n´umero m´aximo
 // de mensajes, de manera que el productor se bloquee cuando el buffer del canal est´a lleno.
 
-const M = 3 //maximo del buffer
+// const MAX = 3 //maximo del buffer
 
-PRODUCTOR = (
-    enviar_msj -> PRODUCTOR
-    |recivir_ack -> PRODUCTOR
-)
+BUFFER(N=5) = COUNT[0],
 
-CONSUMIDOR = (
-    recirvir_msj -> CONSUMIDOR
-    |enviar_ack -> CONSUMIDOR
-)
+COUNT[i:0..N] = (when (i<N) put->COUNT[i+1]
+                |when (i>0) get->COUNT[i-1]
+).
+
+PRODUCER = (put->PRODUCER).
+CONSUMER = (get->CONSUMER).
+
+||BOUNDEDBUFFER = (PRODUCER||BUFFER(5)||CONSUMER).
+
 
