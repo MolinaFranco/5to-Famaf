@@ -1,43 +1,48 @@
-
 -- {-# LANGUAGE LambdaCase #-}
 
 module IntExp
-  ( 
-    IntExp
+  ( IntExp (..),
+    Operators (..),
+    interpIntExp,
   )
 where
+import State
 
 {-
 Gramaticas IntExp:
 ⟨intexp⟩ ::= ⟨natconst⟩
-| ⟨var⟩
-| - ⟨intexp⟩
-| ⟨intexp⟩ ⊕ ⟨intexp⟩
+\| ⟨var⟩
+\| - ⟨intexp⟩
+\| ⟨intexp⟩ ⊕ ⟨intexp⟩
 ⊕ ∈ {+,−,∗, /, %,rem}
 -}
 
-type Var = String
-
-data IntExp 
-  = Int
-  | Var
-  | Neg Int
-  | BinOperator IntExp IntExp
+data IntExp
+  = Const Int
+  | Var String
+  | Neg IntExp
+  | Operation Operators IntExp IntExp
   deriving (Eq, Show)
 
-data BinOperator = Add | Sub | Mul | Div | Mod | Rem
-    deriving (Eq, Show)
+data Operators = Add | Sub | Mul | Div | Mod | Rem
+  deriving (Eq, Show)
 
-type State = Var -> Integer
+evalOp :: Operators -> Int -> Int -> Int
+evalOp op = case op of
+  Add -> (+)
+  Sub -> (-)
+  Mul -> (*)
+  Div -> div
+  Mod -> mod
+  Rem -> rem
 
-interpIntExp :: State -> IntExp -> Integer
+
+interpIntExp :: State -> IntExp -> Int
 interpIntExp state expr = case expr of
-  Const n           -> n
-  Var x             -> env x
-  Neg e             -> negate (evalIntExp env e)
-  BinOp op e1 e2    ->
-    let v1 = evalIntExp env e1
-        v2 = evalIntExp env e2
-    in evalOp op v1 v2
-
-
+  Const n -> n
+  Var s -> state s
+  Neg e -> -(interpIntExp state e)
+  Operation op e1 e2 ->
+    let v1 = interpIntExp state e1
+        v2 = interpIntExp state e2
+     in evalOp op v1 v2
