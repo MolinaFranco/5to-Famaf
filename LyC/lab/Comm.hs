@@ -30,19 +30,36 @@ data Comm
   | Condicional BoolExp Comm Comm
   | NewVar Var IntExp Comm
   | While BoolExp Comm
+  | Fail
   deriving (Eq, Show)
 
-interpComm :: State -> Comm -> State
-interpComm state comm = case comm of
-  Skip -> state
-  Assign v ie -> interpComm (updateState v (interpIntExp state ie) state) comm
-  Seq c1 c2 -> interpComm (interpComm state c1) c2
-  Condicional b ct cf -> if interpBoolExp state b then interpComm state ct else interpComm state cf
-  NewVar v ie c -> updateState v (state v) (interpComm (updateState v (interpIntExp state ie) state) c)
+interpComm :: Comm -> State -> Maybe State
+interpComm comm state = case comm of
+  Skip -> Just state
+  Fail -> Nothing
+  Assign v ie -> Just (updateState v (interpIntExp ie state) state)
+  Seq c1 c2 ->
+    case interpComm c1 state of
+      Nothing -> Nothing
+      Just s' -> interpComm c2 s'
+  Condicional b ct cf ->
+    if interpBoolExp b state
+      then interpComm ct state
+      else interpComm cf state
+  NewVar v ie c ->
+    let initial = interpIntExp ie state
+        oldVal = state v
+        updatedState = updateState v initial state
+     in case interpComm c updatedState of
+          Nothing -> Nothing
+          Just s' -> Just (updateState v oldVal s')
   While be body ->
-    if interpBoolExp state be
-      then interpComm (interpComm state body) (While be body)
-      else state
+    let evalWhile s =
+          if interpBoolExp be s
+            then case interpComm body s of
+              Nothing -> Nothing
+              Just s' -> evalWhile s'
+            else Just s
+     in evalWhile state
 
-  -- el bucle se ejecuta mientras la condición sea verdadera, 
-  -- y cada vez lo hace con el nuevo estado que generó la iteración anterior.
+

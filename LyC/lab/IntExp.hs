@@ -36,13 +36,12 @@ evalOp op = case op of
   Mod -> mod
   Rem -> rem
 
-
-interpIntExp :: State -> IntExp -> Int
-interpIntExp state expr = case expr of
+interpIntExp :: IntExp -> State -> Int
+interpIntExp expr state = case expr of
   Const n -> n
   Var s -> state s
-  Neg e -> -(interpIntExp state e)
+  Neg e -> - (interpIntExp e state)
   Operation op e1 e2 ->
-    let v1 = interpIntExp state e1
-        v2 = interpIntExp state e2
-     in evalOp op v1 v2
+    let v1 = interpIntExp e1 state
+        v2 = interpIntExp e2 state
+    in evalOp op v1 v2

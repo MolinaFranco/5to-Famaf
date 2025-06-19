@@ -51,15 +51,15 @@ evalOp op b1 b2 = case op of
   Imp -> not b1 || b2
   Eqq -> b1 == b2
 
-interpBoolExp :: State -> BoolExp -> Bool
-interpBoolExp state expr = case expr of
+interpBoolExp :: BoolExp -> State -> Bool
+interpBoolExp expr state = case expr of
   ConstB b -> b
-  NegB e -> not (interpBoolExp state e)
+  NegB e -> not (interpBoolExp e state)
   Rel r e1 e2 ->
-    let v1 = interpIntExp state e1
-        v2 = interpIntExp state e2
-     in evalRel r v1 v2
+    let v1 = interpIntExp e1 state
+        v2 = interpIntExp e2 state
+    in evalRel r v1 v2
   OperationB op e1 e2 ->
-    let v1 = interpBoolExp state e1
-        v2 = interpBoolExp state e2
-     in evalOp op v1 v2
+    let v1 = interpBoolExp e1 state
+        v2 = interpBoolExp e2 state
+    in evalOp op v1 v2
