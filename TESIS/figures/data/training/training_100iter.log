@@ -1,0 +1,701 @@
+
+======================================================================
+ENTRENAMIENTO MÚLTIPLE DE MODELO SSN ECHEVESTE2020
+======================================================================
+
+Configuración:
+  Número de corridas: 5
+  Stage 1 max_iter: 100
+  Stage 2 max_iter: 100
+  Directorio de salida: /home/molina/FAMAF/5to-Famaf/TESIS/figuras/data/training
+  Timestamp: 20251114_092628
+
+Inicializando modelo GSM...
+Loaded pre-trained GSM data from GSMDataLoader
+✓ GSM inicializado
+
+
+======================================================================
+CORRIDA 1/5
+======================================================================
+
+JAX configurado para GPU: cuda:0
+BrainPy configurado para GPU
+Parámetros Stage 1: max_iter=100, n_samples=50
+Parámetros Stage 2: max_iter=100, n_samples=50
+
+Computing GSM posterior targets...
+  Contrast: 0.5
+  GSM samples: 50
+  h_vec shape: (100,)
+  Target mu shape: (50,)
+  Target sigma shape: (50, 50)
+============================================================
+Stage 1: ADAM with sample-based optimization
+============================================================
+Parameters:
+  Optimizer: ADAM
+  Max iterations: 100
+  N_trials per iteration: 50
+  Learning rate (η): 0.002
+  Beta1: 0.9, Beta2: 0.999
+  T_min annealing: 0ms → 50ms
+Initial parameters: {'a_EE': 0.02, 'a_EI': 0.02, 'a_IE': 0.02, 'a_II': 0.02, 'd_EE': 0.8, 'd_EI': 0.8, 'd_IE': 0.8, 'd_II': 0.8}
+============================================================
+Iteration     1 | Cost: 29.00587 | T_min: 0.5ms | ||grad||: 312.347
+Iteration    10 | Cost: 17.49013 | T_min: 5.0ms | ||grad||: 173.091
+Iteration    20 | Cost: 12.82572 | T_min: 10.0ms | ||grad||: 146.385
+Iteration    30 | Cost: 8.05850 | T_min: 15.0ms | ||grad||: 92.851
+Iteration    40 | Cost: 6.05207 | T_min: 20.0ms | ||grad||: 65.082
+Iteration    50 | Cost: 3.63907 | T_min: 25.0ms | ||grad||: 29.713
+Iteration    60 | Cost: 2.62278 | T_min: 30.0ms | ||grad||: 19.835
+Iteration    70 | Cost: 1.62105 | T_min: 35.0ms | ||grad||: 10.453
+Iteration    80 | Cost: 1.42093 | T_min: 40.0ms | ||grad||: 7.295
+Iteration    90 | Cost: 1.30630 | T_min: 45.0ms | ||grad||: 3.224
+Iteration   100 | Cost: 0.88166 | T_min: 50.0ms | ||grad||: 2.298
+============================================================
+Stage 1 completed:
+  Final cost: 0.731713
+  Iterations: 100
+  Optimized parameters: {'a_EE': Array(0.01068467, dtype=float32), 'a_EI': Array(0.09132943, dtype=float32), 'a_IE': Array(0.08804647, dtype=float32), 'a_II': Array(0.01, dtype=float32), 'd_EE': Array(0.72391546, dtype=float32), 'd_EI': Array(0.98307884, dtype=float32), 'd_IE': Array(0.974762, dtype=float32), 'd_II': Array(0.6325332, dtype=float32)}
+============================================================
+✓ Stage 1 completed successfully
+======================================================================
+STAGE 2: L-BFGS-B with ADF (15 parameters)
+======================================================================
+
+Optimization parameters:
+  max_iter: 100
+  dt: 0.0002 s
+  t_max: 0.1 s
+  min_time: 0.05 s
+  lambda weights: mean=1.0, var=2.0, cov=1.0, slow=0.01
+
+Generating GSM targets (apply_transformation=False)...
+  Generated 50 samples at contrast=0.5
+  h_inputs shape: (50, 100)
+
+Initializing 15 parameters...
+  Computed input_baseline_lb: 6.794227
+  Using default connectivity (Stage 1 not completed):
+
+  Input transformation:
+    α_h = 1.0000
+    β_h = 7.7942
+    γ_h = 1.0000
+  Connectivity (sample):
+    a_EE = 0.0200
+    d_EE = 0.8000
+  Noise:
+    width = 0.8000
+    σ_E = 2.0000
+    σ_I = 2.0000
+    ρ = 0.8000
+
+Creating objective function (15 parameters)...
+Calculated input_baseline_lb: 9.145929
+  ✓ Objective function created
+  ✓ Gradient function (JAX autodiff)
+  ✓ Pack/unpack functions for 15 parameters
+
+  Packed parameters: x0.shape = (15,)
+
+Configuring bounds for 15 parameters...
+  Configured 15 bounds
+
+Starting L-BFGS-B optimization...
+  Initial cost: nan
+
+Optimization complete:
+  Success: False
+  Message: ABNORMAL: 
+  Final cost: nan
+  Iterations: 0/100
+  Function evaluations: 22
+
+Parameter changes:
+  Input transformation:
+    α_h: 1.0000 → 1.0000
+    β_h: 7.7942 → nan
+    γ_h: 1.0000 → 1.0000
+  Connectivity (sample):
+    a_EE: 0.0200 → 0.0200
+    d_EE: 0.8000 → 0.8000
+  Noise:
+    width: 0.8000 → 0.8000
+    σ_E: 2.0000 → 2.0000
+    σ_I: 2.0000 → 2.0000
+    ρ: 0.8000 → 0.8000
+
+✗ Optimization failed, parameters NOT updated
+✗ Stage 2 failed: ABNORMAL: 
+
+──────────────────────────────────────────────────────────────────────
+RESUMEN CORRIDA 1
+──────────────────────────────────────────────────────────────────────
+
+Stage 1: ✓ CONVERGED
+  Final cost: 7.317125e-01
+  Iterations: 100
+
+Stage 2: ✗ FAILED
+  Final cost: nan
+  Iterations: 0
+
+Parámetros vs Echeveste:
+  α_h: 1.0000 (ref: 1.9555)
+  β_h: 0.0000 (ref: 0.1032)
+  γ_h: 1.0000 (ref: 2.0343)
+  a_EE: 0.0107 (ref: 0.3311)
+
+======================================================================
+CORRIDA 2/5
+======================================================================
+
+JAX configurado para GPU: cuda:0
+BrainPy configurado para GPU
+Parámetros Stage 1: max_iter=100, n_samples=50
+Parámetros Stage 2: max_iter=100, n_samples=50
+
+Computing GSM posterior targets...
+  Contrast: 0.5
+  GSM samples: 50
+  h_vec shape: (100,)
+  Target mu shape: (50,)
+  Target sigma shape: (50, 50)
+============================================================
+Stage 1: ADAM with sample-based optimization
+============================================================
+Parameters:
+  Optimizer: ADAM
+  Max iterations: 100
+  N_trials per iteration: 50
+  Learning rate (η): 0.002
+  Beta1: 0.9, Beta2: 0.999
+  T_min annealing: 0ms → 50ms
+Initial parameters: {'a_EE': 0.02, 'a_EI': 0.02, 'a_IE': 0.02, 'a_II': 0.02, 'd_EE': 0.8, 'd_EI': 0.8, 'd_IE': 0.8, 'd_II': 0.8}
+============================================================
+Iteration     1 | Cost: 29.00919 | T_min: 0.5ms | ||grad||: 312.436
+Iteration    10 | Cost: 17.49556 | T_min: 5.0ms | ||grad||: 173.115
+Iteration    20 | Cost: 12.83286 | T_min: 10.0ms | ||grad||: 146.456
+Iteration    30 | Cost: 8.06192 | T_min: 15.0ms | ||grad||: 92.849
+Iteration    40 | Cost: 6.05062 | T_min: 20.0ms | ||grad||: 65.050
+Iteration    50 | Cost: 3.63925 | T_min: 25.0ms | ||grad||: 29.721
+Iteration    60 | Cost: 2.62124 | T_min: 30.0ms | ||grad||: 19.860
+Iteration    70 | Cost: 1.62139 | T_min: 35.0ms | ||grad||: 10.492
+Iteration    80 | Cost: 1.42057 | T_min: 40.0ms | ||grad||: 7.313
+Iteration    90 | Cost: 1.30740 | T_min: 45.0ms | ||grad||: 3.228
+Iteration   100 | Cost: 0.88104 | T_min: 50.0ms | ||grad||: 2.303
+============================================================
+Stage 1 completed:
+  Final cost: 0.733308
+  Iterations: 100
+  Optimized parameters: {'a_EE': Array(0.01068397, dtype=float32), 'a_EI': Array(0.09136342, dtype=float32), 'a_IE': Array(0.0880473, dtype=float32), 'a_II': Array(0.01, dtype=float32), 'd_EE': Array(0.7239185, dtype=float32), 'd_EI': Array(0.9832328, dtype=float32), 'd_IE': Array(0.97473323, dtype=float32), 'd_II': Array(0.63250333, dtype=float32)}
+============================================================
+✓ Stage 1 completed successfully
+======================================================================
+STAGE 2: L-BFGS-B with ADF (15 parameters)
+======================================================================
+
+Optimization parameters:
+  max_iter: 100
+  dt: 0.0002 s
+  t_max: 0.1 s
+  min_time: 0.05 s
+  lambda weights: mean=1.0, var=2.0, cov=1.0, slow=0.01
+
+Generating GSM targets (apply_transformation=False)...
+  Generated 50 samples at contrast=0.5
+  h_inputs shape: (50, 100)
+
+Initializing 15 parameters...
+  Computed input_baseline_lb: 8.112473
+  Using default connectivity (Stage 1 not completed):
+
+  Input transformation:
+    α_h = 1.0000
+    β_h = 9.1125
+    γ_h = 1.0000
+  Connectivity (sample):
+    a_EE = 0.0200
+    d_EE = 0.8000
+  Noise:
+    width = 0.8000
+    σ_E = 2.0000
+    σ_I = 2.0000
+    ρ = 0.8000
+
+Creating objective function (15 parameters)...
+Calculated input_baseline_lb: 6.907484
+  ✓ Objective function created
+  ✓ Gradient function (JAX autodiff)
+  ✓ Pack/unpack functions for 15 parameters
+
+  Packed parameters: x0.shape = (15,)
+
+Configuring bounds for 15 parameters...
+  Configured 15 bounds
+
+Starting L-BFGS-B optimization...
+  Initial cost: 17.867182
+
+Optimization complete:
+  Success: False
+  Message: STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+  Final cost: 0.002110
+  Iterations: 100/100
+  Function evaluations: 131
+
+Parameter changes:
+  Input transformation:
+    α_h: 1.0000 → 0.0000
+    β_h: 9.1125 → 8.8195
+    γ_h: 1.0000 → 0.0000
+  Connectivity (sample):
+    a_EE: 0.0200 → 0.0100
+    d_EE: 0.8000 → 1.4142
+  Noise:
+    width: 0.8000 → 0.0100
+    σ_E: 2.0000 → 1.5889
+    σ_I: 2.0000 → 3.6067
+    ρ: 0.8000 → 0.9879
+
+✗ Optimization failed, parameters NOT updated
+✗ Stage 2 failed: STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+──────────────────────────────────────────────────────────────────────
+RESUMEN CORRIDA 2
+──────────────────────────────────────────────────────────────────────
+
+Stage 1: ✓ CONVERGED
+  Final cost: 7.333083e-01
+  Iterations: 100
+
+Stage 2: ✗ FAILED
+  Final cost: 2.109992e-03
+  Iterations: 100
+
+Parámetros vs Echeveste:
+  α_h: 1.0000 (ref: 1.9555)
+  β_h: 0.0000 (ref: 0.1032)
+  γ_h: 1.0000 (ref: 2.0343)
+  a_EE: 0.0107 (ref: 0.3311)
+
+======================================================================
+CORRIDA 3/5
+======================================================================
+
+JAX configurado para GPU: cuda:0
+BrainPy configurado para GPU
+Parámetros Stage 1: max_iter=100, n_samples=50
+Parámetros Stage 2: max_iter=100, n_samples=50
+
+Computing GSM posterior targets...
+  Contrast: 0.5
+  GSM samples: 50
+  h_vec shape: (100,)
+  Target mu shape: (50,)
+  Target sigma shape: (50, 50)
+============================================================
+Stage 1: ADAM with sample-based optimization
+============================================================
+Parameters:
+  Optimizer: ADAM
+  Max iterations: 100
+  N_trials per iteration: 50
+  Learning rate (η): 0.002
+  Beta1: 0.9, Beta2: 0.999
+  T_min annealing: 0ms → 50ms
+Initial parameters: {'a_EE': 0.02, 'a_EI': 0.02, 'a_IE': 0.02, 'a_II': 0.02, 'd_EE': 0.8, 'd_EI': 0.8, 'd_IE': 0.8, 'd_II': 0.8}
+============================================================
+Iteration     1 | Cost: 29.00903 | T_min: 0.5ms | ||grad||: 312.439
+Iteration    10 | Cost: 17.49526 | T_min: 5.0ms | ||grad||: 173.087
+Iteration    20 | Cost: 12.83202 | T_min: 10.0ms | ||grad||: 146.340
+Iteration    30 | Cost: 8.06362 | T_min: 15.0ms | ||grad||: 92.804
+Iteration    40 | Cost: 6.05678 | T_min: 20.0ms | ||grad||: 65.062
+Iteration    50 | Cost: 3.64222 | T_min: 25.0ms | ||grad||: 29.724
+Iteration    60 | Cost: 2.62512 | T_min: 30.0ms | ||grad||: 19.867
+Iteration    70 | Cost: 1.62284 | T_min: 35.0ms | ||grad||: 10.481
+Iteration    80 | Cost: 1.42211 | T_min: 40.0ms | ||grad||: 7.304
+Iteration    90 | Cost: 1.30752 | T_min: 45.0ms | ||grad||: 3.230
+Iteration   100 | Cost: 0.88225 | T_min: 50.0ms | ||grad||: 2.303
+============================================================
+Stage 1 completed:
+  Final cost: 0.732491
+  Iterations: 100
+  Optimized parameters: {'a_EE': Array(0.01068379, dtype=float32), 'a_EI': Array(0.09136507, dtype=float32), 'a_IE': Array(0.08807728, dtype=float32), 'a_II': Array(0.01, dtype=float32), 'd_EE': Array(0.7239011, dtype=float32), 'd_EI': Array(0.983152, dtype=float32), 'd_IE': Array(0.97475666, dtype=float32), 'd_II': Array(0.6325167, dtype=float32)}
+============================================================
+✓ Stage 1 completed successfully
+======================================================================
+STAGE 2: L-BFGS-B with ADF (15 parameters)
+======================================================================
+
+Optimization parameters:
+  max_iter: 100
+  dt: 0.0002 s
+  t_max: 0.1 s
+  min_time: 0.05 s
+  lambda weights: mean=1.0, var=2.0, cov=1.0, slow=0.01
+
+Generating GSM targets (apply_transformation=False)...
+  Generated 50 samples at contrast=0.5
+  h_inputs shape: (50, 100)
+
+Initializing 15 parameters...
+  Computed input_baseline_lb: 7.110311
+  Using default connectivity (Stage 1 not completed):
+
+  Input transformation:
+    α_h = 1.0000
+    β_h = 8.1103
+    γ_h = 1.0000
+  Connectivity (sample):
+    a_EE = 0.0200
+    d_EE = 0.8000
+  Noise:
+    width = 0.8000
+    σ_E = 2.0000
+    σ_I = 2.0000
+    ρ = 0.8000
+
+Creating objective function (15 parameters)...
+Calculated input_baseline_lb: 9.019869
+  ✓ Objective function created
+  ✓ Gradient function (JAX autodiff)
+  ✓ Pack/unpack functions for 15 parameters
+
+  Packed parameters: x0.shape = (15,)
+
+Configuring bounds for 15 parameters...
+  Configured 15 bounds
+
+Starting L-BFGS-B optimization...
+  Initial cost: nan
+
+Optimization complete:
+  Success: False
+  Message: ABNORMAL: 
+  Final cost: nan
+  Iterations: 0/100
+  Function evaluations: 22
+
+Parameter changes:
+  Input transformation:
+    α_h: 1.0000 → 1.0000
+    β_h: 8.1103 → nan
+    γ_h: 1.0000 → 1.0000
+  Connectivity (sample):
+    a_EE: 0.0200 → 0.0200
+    d_EE: 0.8000 → 0.8000
+  Noise:
+    width: 0.8000 → 0.8000
+    σ_E: 2.0000 → 2.0000
+    σ_I: 2.0000 → 2.0000
+    ρ: 0.8000 → 0.8000
+
+✗ Optimization failed, parameters NOT updated
+✗ Stage 2 failed: ABNORMAL: 
+
+──────────────────────────────────────────────────────────────────────
+RESUMEN CORRIDA 3
+──────────────────────────────────────────────────────────────────────
+
+Stage 1: ✓ CONVERGED
+  Final cost: 7.324907e-01
+  Iterations: 100
+
+Stage 2: ✗ FAILED
+  Final cost: nan
+  Iterations: 0
+
+Parámetros vs Echeveste:
+  α_h: 1.0000 (ref: 1.9555)
+  β_h: 0.0000 (ref: 0.1032)
+  γ_h: 1.0000 (ref: 2.0343)
+  a_EE: 0.0107 (ref: 0.3311)
+
+======================================================================
+CORRIDA 4/5
+======================================================================
+
+JAX configurado para GPU: cuda:0
+BrainPy configurado para GPU
+Parámetros Stage 1: max_iter=100, n_samples=50
+Parámetros Stage 2: max_iter=100, n_samples=50
+
+Computing GSM posterior targets...
+  Contrast: 0.5
+  GSM samples: 50
+  h_vec shape: (100,)
+  Target mu shape: (50,)
+  Target sigma shape: (50, 50)
+============================================================
+Stage 1: ADAM with sample-based optimization
+============================================================
+Parameters:
+  Optimizer: ADAM
+  Max iterations: 100
+  N_trials per iteration: 50
+  Learning rate (η): 0.002
+  Beta1: 0.9, Beta2: 0.999
+  T_min annealing: 0ms → 50ms
+Initial parameters: {'a_EE': 0.02, 'a_EI': 0.02, 'a_IE': 0.02, 'a_II': 0.02, 'd_EE': 0.8, 'd_EI': 0.8, 'd_IE': 0.8, 'd_II': 0.8}
+============================================================
+Iteration     1 | Cost: 29.01525 | T_min: 0.5ms | ||grad||: 312.599
+Iteration    10 | Cost: 17.49163 | T_min: 5.0ms | ||grad||: 173.051
+Iteration    20 | Cost: 12.82530 | T_min: 10.0ms | ||grad||: 146.232
+Iteration    30 | Cost: 8.06725 | T_min: 15.0ms | ||grad||: 92.775
+Iteration    40 | Cost: 6.06046 | T_min: 20.0ms | ||grad||: 65.040
+Iteration    50 | Cost: 3.64524 | T_min: 25.0ms | ||grad||: 29.723
+Iteration    60 | Cost: 2.62884 | T_min: 30.0ms | ||grad||: 19.864
+Iteration    70 | Cost: 1.62602 | T_min: 35.0ms | ||grad||: 10.453
+Iteration    80 | Cost: 1.42661 | T_min: 40.0ms | ||grad||: 7.322
+Iteration    90 | Cost: 1.30849 | T_min: 45.0ms | ||grad||: 3.229
+Iteration   100 | Cost: 0.88467 | T_min: 50.0ms | ||grad||: 2.302
+============================================================
+Stage 1 completed:
+  Final cost: 0.732920
+  Iterations: 100
+  Optimized parameters: {'a_EE': Array(0.01068322, dtype=float32), 'a_EI': Array(0.09133971, dtype=float32), 'a_IE': Array(0.08812397, dtype=float32), 'a_II': Array(0.01, dtype=float32), 'd_EE': Array(0.7238871, dtype=float32), 'd_EI': Array(0.98291624, dtype=float32), 'd_IE': Array(0.9748863, dtype=float32), 'd_II': Array(0.632416, dtype=float32)}
+============================================================
+✓ Stage 1 completed successfully
+======================================================================
+STAGE 2: L-BFGS-B with ADF (15 parameters)
+======================================================================
+
+Optimization parameters:
+  max_iter: 100
+  dt: 0.0002 s
+  t_max: 0.1 s
+  min_time: 0.05 s
+  lambda weights: mean=1.0, var=2.0, cov=1.0, slow=0.01
+
+Generating GSM targets (apply_transformation=False)...
+  Generated 50 samples at contrast=0.5
+  h_inputs shape: (50, 100)
+
+Initializing 15 parameters...
+  Computed input_baseline_lb: 8.596237
+  Using default connectivity (Stage 1 not completed):
+
+  Input transformation:
+    α_h = 1.0000
+    β_h = 9.5962
+    γ_h = 1.0000
+  Connectivity (sample):
+    a_EE = 0.0200
+    d_EE = 0.8000
+  Noise:
+    width = 0.8000
+    σ_E = 2.0000
+    σ_I = 2.0000
+    ρ = 0.8000
+
+Creating objective function (15 parameters)...
+Calculated input_baseline_lb: 7.903602
+  ✓ Objective function created
+  ✓ Gradient function (JAX autodiff)
+  ✓ Pack/unpack functions for 15 parameters
+
+  Packed parameters: x0.shape = (15,)
+
+Configuring bounds for 15 parameters...
+  Configured 15 bounds
+
+Starting L-BFGS-B optimization...
+  Initial cost: 19.261351
+
+Optimization complete:
+  Success: True
+  Message: CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH
+  Final cost: 0.002785
+  Iterations: 66/100
+  Function evaluations: 95
+
+Parameter changes:
+  Input transformation:
+    α_h: 1.0000 → 0.0000
+    β_h: 9.5962 → 9.4895
+    γ_h: 1.0000 → 0.0000
+  Connectivity (sample):
+    a_EE: 0.0200 → 0.0100
+    d_EE: 0.8000 → 0.8872
+  Noise:
+    width: 0.8000 → 0.0100
+    σ_E: 2.0000 → 1.3794
+    σ_I: 2.0000 → 1.9017
+    ρ: 0.8000 → 0.8986
+
+✓ Model parameters updated successfully
+
+❌ ERROR en corrida 4: 'NoneType' object has no attribute 'get'
+Continuando con siguiente corrida...
+
+
+======================================================================
+CORRIDA 5/5
+======================================================================
+
+JAX configurado para GPU: cuda:0
+BrainPy configurado para GPU
+Parámetros Stage 1: max_iter=100, n_samples=50
+Parámetros Stage 2: max_iter=100, n_samples=50
+
+Computing GSM posterior targets...
+  Contrast: 0.5
+  GSM samples: 50
+  h_vec shape: (100,)
+  Target mu shape: (50,)
+  Target sigma shape: (50, 50)
+============================================================
+Stage 1: ADAM with sample-based optimization
+============================================================
+Parameters:
+  Optimizer: ADAM
+  Max iterations: 100
+  N_trials per iteration: 50
+  Learning rate (η): 0.002
+  Beta1: 0.9, Beta2: 0.999
+  T_min annealing: 0ms → 50ms
+Initial parameters: {'a_EE': 0.02, 'a_EI': 0.02, 'a_IE': 0.02, 'a_II': 0.02, 'd_EE': 0.8, 'd_EI': 0.8, 'd_IE': 0.8, 'd_II': 0.8}
+============================================================
+Iteration     1 | Cost: 29.00846 | T_min: 0.5ms | ||grad||: 312.411
+Iteration    10 | Cost: 17.49072 | T_min: 5.0ms | ||grad||: 173.087
+Iteration    20 | Cost: 12.82718 | T_min: 10.0ms | ||grad||: 146.427
+Iteration    30 | Cost: 8.05902 | T_min: 15.0ms | ||grad||: 92.871
+Iteration    40 | Cost: 6.05046 | T_min: 20.0ms | ||grad||: 65.053
+Iteration    50 | Cost: 3.63848 | T_min: 25.0ms | ||grad||: 29.718
+Iteration    60 | Cost: 2.62181 | T_min: 30.0ms | ||grad||: 19.846
+Iteration    70 | Cost: 1.62091 | T_min: 35.0ms | ||grad||: 10.467
+Iteration    80 | Cost: 1.41986 | T_min: 40.0ms | ||grad||: 7.307
+Iteration    90 | Cost: 1.30671 | T_min: 45.0ms | ||grad||: 3.226
+Iteration   100 | Cost: 0.88132 | T_min: 50.0ms | ||grad||: 2.299
+============================================================
+Stage 1 completed:
+  Final cost: 0.732348
+  Iterations: 100
+  Optimized parameters: {'a_EE': Array(0.01068437, dtype=float32), 'a_EI': Array(0.09134089, dtype=float32), 'a_IE': Array(0.08804047, dtype=float32), 'a_II': Array(0.01, dtype=float32), 'd_EE': Array(0.7239271, dtype=float32), 'd_EI': Array(0.9831101, dtype=float32), 'd_IE': Array(0.9747511, dtype=float32), 'd_II': Array(0.63251615, dtype=float32)}
+============================================================
+✓ Stage 1 completed successfully
+======================================================================
+STAGE 2: L-BFGS-B with ADF (15 parameters)
+======================================================================
+
+Optimization parameters:
+  max_iter: 100
+  dt: 0.0002 s
+  t_max: 0.1 s
+  min_time: 0.05 s
+  lambda weights: mean=1.0, var=2.0, cov=1.0, slow=0.01
+
+Generating GSM targets (apply_transformation=False)...
+  Generated 50 samples at contrast=0.5
+  h_inputs shape: (50, 100)
+
+Initializing 15 parameters...
+  Computed input_baseline_lb: 8.666401
+  Using default connectivity (Stage 1 not completed):
+
+  Input transformation:
+    α_h = 1.0000
+    β_h = 9.6664
+    γ_h = 1.0000
+  Connectivity (sample):
+    a_EE = 0.0200
+    d_EE = 0.8000
+  Noise:
+    width = 0.8000
+    σ_E = 2.0000
+    σ_I = 2.0000
+    ρ = 0.8000
+
+Creating objective function (15 parameters)...
+Calculated input_baseline_lb: 8.651463
+  ✓ Objective function created
+  ✓ Gradient function (JAX autodiff)
+  ✓ Pack/unpack functions for 15 parameters
+
+  Packed parameters: x0.shape = (15,)
+
+Configuring bounds for 15 parameters...
+  Configured 15 bounds
+
+Starting L-BFGS-B optimization...
+  Initial cost: 19.466616
+
+Optimization complete:
+  Success: False
+  Message: STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+  Final cost: 0.001707
+  Iterations: 100/100
+  Function evaluations: 129
+
+Parameter changes:
+  Input transformation:
+    α_h: 1.0000 → 0.3266
+    β_h: 9.6664 → 9.5438
+    γ_h: 1.0000 → 0.0000
+  Connectivity (sample):
+    a_EE: 0.0200 → 0.0100
+    d_EE: 0.8000 → 1.4142
+  Noise:
+    width: 0.8000 → 0.0100
+    σ_E: 2.0000 → 2.2695
+    σ_I: 2.0000 → 4.0000
+    ρ: 0.8000 → 0.9992
+
+✗ Optimization failed, parameters NOT updated
+✗ Stage 2 failed: STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+──────────────────────────────────────────────────────────────────────
+RESUMEN CORRIDA 5
+──────────────────────────────────────────────────────────────────────
+
+Stage 1: ✓ CONVERGED
+  Final cost: 7.323477e-01
+  Iterations: 100
+
+Stage 2: ✗ FAILED
+  Final cost: 1.706636e-03
+  Iterations: 100
+
+Parámetros vs Echeveste:
+  α_h: 1.0000 (ref: 1.9555)
+  β_h: 0.0000 (ref: 0.1032)
+  γ_h: 1.0000 (ref: 2.0343)
+  a_EE: 0.0107 (ref: 0.3311)
+
+✓ Resultados guardados en: /home/molina/FAMAF/5to-Famaf/TESIS/figuras/data/training/results_20251114_092628.npy
+✓ Metadatos guardados en: /home/molina/FAMAF/5to-Famaf/TESIS/figuras/data/training/metadata_20251114_092628.json
+
+======================================================================
+ESTADÍSTICAS FINALES (4 corridas)
+======================================================================
+
+input_scaling       : 1.0000 ± 0.0000 (ref: 1.9555, diff: 48.9%)
+input_baseline      : 0.0000 ± 0.0000 (ref: 0.1032, diff: 100.0%)
+input_nl_pow        : 1.0000 ± 0.0000 (ref: 2.0343, diff: 50.8%)
+a_EE                : 0.0107 ± 0.0000 (ref: 0.3311, diff: 96.8%)
+a_EI                : 0.0913 ± 0.0000 (ref: 0.0813, diff: 12.4%)
+a_IE                : 0.0881 ± 0.0000 (ref: 0.3632, diff: 75.8%)
+a_II                : 0.0100 ± 0.0000 (ref: 0.0736, diff: 86.4%)
+d_EE                : 0.7239 ± 0.0000 (ref: 0.8028, diff: 9.8%)
+d_EI                : 0.9831 ± 0.0001 (ref: 0.5687, diff: 72.9%)
+d_IE                : 0.9748 ± 0.0000 (ref: 0.8598, diff: 13.4%)
+d_II                : 0.6325 ± 0.0000 (ref: 0.6298, diff: 0.4%)
+sigma_eta_width     : 0.8000 ± 0.0000 (ref: 0.4780, diff: 67.4%)
+sigma_eta_std_e     : 2.0000 ± 0.0000 (ref: 6.3992, diff: 68.7%)
+sigma_eta_std_i     : 2.0000 ± 0.0000 (ref: 3.5335, diff: 43.4%)
+sigma_eta_rho       : 0.8000 ± 0.0000 (ref: 0.9929, diff: 19.4%)
+
+Convergencia:
+  Stage 1: 4/4 (100%)
+  Stage 2: 0/4 (0%)
+
+======================================================================
+✓ ENTRENAMIENTO COMPLETADO
+======================================================================
+
+Para visualizar resultados, ejecutar:
+  python3 figuras/Parametros/graficar_parametros.py --results_file results_20251114_092628.npy
+

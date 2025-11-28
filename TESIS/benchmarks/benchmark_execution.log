@@ -1,0 +1,65 @@
+======================================================================
+VERIFICACIÓN DE GPU
+======================================================================
+Dispositivos JAX: [CudaDevice(id=0)]
+Backend por defecto: gpu
+GPU disponible: True
+======================================================================
+
+
+╔====================================================================╗
+║                    BENCHMARK COMPLETO GPU                           ║
+╚====================================================================╝
+
+
+######################################################################
+# 1. JAX OPERATIONS (Training)
+######################################################################
+
+--- CPU ---
+
+======================================================================
+Benchmark JAX Operations (device=cpu)
+======================================================================
+  Trial 1/10: 128.86ms
+  Trial 4/10: 1.49ms
+  Trial 7/10: 0.72ms
+  Trial 10/10: 0.60ms
+
+  Promedio: 13.89 ± 38.33ms
+
+--- GPU ---
+
+======================================================================
+Benchmark JAX Operations (device=gpu)
+======================================================================
+  Trial 1/10: 192.68ms
+  Trial 4/10: 0.82ms
+  Trial 7/10: 0.96ms
+  Trial 10/10: 0.98ms
+
+  Promedio: 20.13 ± 57.52ms
+
+🚀 Speedup: 0.69x más rápido en GPU
+
+######################################################################
+# 2. BRAINPY SIMULATION
+######################################################################
+
+--- CPU ---
+
+======================================================================
+Benchmark BrainPy Simulation (device=cpu)
+======================================================================
+Traceback (most recent call last):
+  File "/home/molina/FAMAF/5to-Famaf/TESIS/pycloude/benchmark_gpu_completo.py", line 519, in <module>
+    main()
+  File "/home/molina/FAMAF/5to-Famaf/TESIS/pycloude/benchmark_gpu_completo.py", line 481, in main
+    results = run_all_benchmarks()
+  File "/home/molina/FAMAF/5to-Famaf/TESIS/pycloude/benchmark_gpu_completo.py", line 273, in run_all_benchmarks
+    cpu_time, cpu_std = benchmark_brainpy_simulation(
+  File "/home/molina/FAMAF/5to-Famaf/TESIS/pycloude/benchmark_gpu_completo.py", line 119, in benchmark_brainpy_simulation
+    import brainpy as bp
+  File "/home/molina/.local/lib/python3.10/site-packages/brainpy/__init__.py", line 9, in <module>
+    assert jax.__version_info__ < (0, 5, 0), 'brainpy only supports jax < 0.5.0, current jax version is {}'.format(jax.__version__)
+AssertionError: brainpy only supports jax < 0.5.0, current jax version is 0.6.2

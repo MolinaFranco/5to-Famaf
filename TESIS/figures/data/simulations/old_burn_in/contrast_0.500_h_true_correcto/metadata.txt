@@ -1,0 +1,18 @@
+Simulación Echeveste2020 - h_true correcto
+============================================================
+
+Fecha: 2025-11-21 00:57:24
+
+Parámetros:
+  Contraste: 0.500
+  Ruido: 0.1
+  Neuronas: 50E + 50I
+  Tiempo: 1000.0 ms
+  dt: 0.2 ms
+  Burn-in: 200.0 ms
+
+Estadísticas (estado estacionario):
+  u_E mean: 4.481355
+  r_E mean: 6.896165
+
+USA h_true correcto del código original Echeveste

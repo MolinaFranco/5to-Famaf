@@ -1,0 +1,183 @@
+================================================================================
+ANÁLISIS DEL MAPEO DE ORIENTACIONES EN ECHEVESTE ET AL. (2020)
+================================================================================
+
+1. PARÁMETROS BÁSICOS DE LA RED
+--------------------------------------------------------------------------------
+Número de neuronas excitatorias (E): 50
+Número de neuronas inhibitorias (I): 50
+Número total de neuronas: 100
+
+2. MAPEO DE ORIENTACIONES
+--------------------------------------------------------------------------------
+Rango de θ: [0, π] radianes = [0°, 180°)
+Espaciado entre neuronas: Δθ = 3.60°
+Total de orientaciones únicas: 50
+
+Mapeo de índices de neuronas a orientaciones preferidas:
+
+  Índice | θ (rad) | θ (deg) | θ centered (deg)
+  --------------------------------------------------
+  E[ 0] |  0.0000 |    0.00° |  -90.00°
+  E[ 1] |  0.0628 |    3.60° |  -86.40°
+  E[12] |  0.7540 |   43.20° |  -46.80°
+  E[13] |  0.8168 |   46.80° |  -43.20°
+  E[24] |  1.5080 |   86.40° |   -3.60°
+  E[25] |  1.5708 |   90.00° |    0.00°
+  E[26] |  1.6336 |   93.60° |    3.60°
+  E[37] |  2.3248 |  133.20° |   43.20°
+  E[38] |  2.3876 |  136.80° |   46.80°
+  E[49] |  3.0788 |  176.40° |   86.40°
+
+INTERPRETACIÓN:
+- Neurona E[0]:  representa θ = 0° = -90° (vertical, orientación hacia abajo)
+- Neurona E[25]: representa θ = 90° = 0° (horizontal)
+- Neurona E[49]: representa θ ≈ 176.4° = 86.4° (casi vertical hacia arriba)
+
+IMPORTANTE: Las orientaciones visuales son π-periódicas, por lo que
+una línea a 0° es idéntica a una a 180°. Por eso solo necesitamos
+el rango [0°, 180°) para representar todas las orientaciones posibles.
+
+3. ESTRUCTURA DE ANILLOS (RING TOPOLOGY)
+--------------------------------------------------------------------------------
+La red tiene una topología de anillo donde:
+- Las neuronas están organizadas espacialmente según su orientación preferida
+- Cada neurona E tiene una neurona I 'emparejada' con la misma orientación
+- La conectividad es CIRCULANTE: W[i,j] depende solo de |θ_i - θ_j|
+
+Organización de las 100 neuronas:
+  Índices [0-49]:   Neuronas excitatorias (E), θ ∈ [0°, 180°)
+  Índices [50-99]:  Neuronas inhibitorias (I), θ ∈ [0°, 180°)
+
+Ejemplo de emparejamiento E-I:
+  E[0]  (θ=0°)    <-> I[50] (θ=0°)
+  E[25] (θ=90°)   <-> I[75] (θ=90°)
+  E[49] (θ≈176°)  <-> I[99] (θ≈176°)
+
+4. MATRIZ DE CONECTIVIDAD W_LEARN
+--------------------------------------------------------------------------------
+Shape de w_learn: (100, 100)
+Tipo: matriz de conectividad completa (100x100)
+
+Estructura de bloques de W:
+
+        | E (cols 0-49)  | I (cols 50-99)
+  ------|----------------|----------------
+  E     | W_EE (50x50)   | W_EI (50x50)
+  (rows)| (excitatorio)  | (inhibitorio)
+  0-49  |                |
+  ------|----------------|----------------
+  I     | W_IE (50x50)   | W_II (50x50)
+  (rows)| (excitatorio)  | (inhibitorio)
+  50-99 |                |
+
+Estadísticas de cada bloque:
+  W_EE: min=0.014862, max=0.331089, mean=0.119174
+  W_EI: min=-0.081307, max=-0.000168, mean=-0.019423
+  W_IE: min=0.024282, max=0.363215, mean=0.142038
+  W_II: min=-0.073595, max=-0.000475, mean=-0.019776
+
+SIGNOS DE LOS BLOQUES:
+  W_EE > 0: Excitatorio (E -> E)
+  W_EI < 0: Inhibitorio (I -> E)
+  W_IE > 0: Excitatorio (E -> I)
+  W_II < 0: Inhibitorio (I -> I)
+
+5. PROPIEDAD CIRCULANTE (RING TOPOLOGY)
+--------------------------------------------------------------------------------
+En una red con topología de anillo, la conectividad es circulante:
+  W[i,j] = W[i',j'] si |θ_i - θ_j| = |θ_i' - θ_j'| (módulo π)
+
+Verificación en W_EE:
+  W_EE[0,1] = 0.327063
+  W_EE[1,2] = 0.327063
+  ¿Son iguales? True
+
+  W_EE[0,5] = 0.246170
+  W_EE[10,15] = 0.246170
+  ¿Son iguales? True
+
+La diagonal de W_EE (neuronas con orientación idéntica) tiene el valor máximo:
+  Diagonal W_EE[i,i] = 0.331089 (constante para todo i)
+
+6. FÓRMULA PARAMÉTRICA DE CONECTIVIDAD
+--------------------------------------------------------------------------------
+Ecuación 10 (Echeveste et al. 2020):
+
+  W_XY(θ_i, θ_j) = a_XY * exp[(cos(2*(θ_i - θ_j)) - 1) / d_XY²]
+
+donde:
+  - a_XY: amplitud (altura del kernel)
+  - d_XY: ancho del kernel (en radianes)
+  - θ_i, θ_j: orientaciones preferidas de neuronas i, j
+  - El factor 2 en cos(2*Δθ) refleja la periodicidad π de las orientaciones
+
+Parámetros aprendidos:
+  a_EE = 0.331089,  d_EE = 0.802756 rad = 45.99°
+  a_EI = 0.081307,  d_EI = 0.568731 rad = 32.59°
+  a_IE = 0.363215,  d_IE = 0.859828 rad = 49.26°
+  a_II = 0.073595,  d_II = 0.629805 rad = 36.09°
+
+Verificación: reconstrucción de W_EE con la fórmula paramétrica
+  Error máximo: 0.0000000000
+  ¿Reconstrucción exitosa? True
+
+7. CÓMO SE USA w_learn EN SCIKIT-NEUROMSI
+--------------------------------------------------------------------------------
+En _echeveste2020.py, el archivo w_learn se carga como:
+
+  w_learn_path = Path(DATA_DIR) / 'w_learn'
+  self._W = np.loadtxt(w_learn_path)
+
+Estructura de self._W:
+  - Shape: (100, 100)
+  - Filas [0-49]: conexiones hacia neuronas E
+  - Filas [50-99]: conexiones hacia neuronas I
+  - Columnas [0-49]: conexiones desde neuronas E
+  - Columnas [50-99]: conexiones desde neuronas I
+
+Acceso a bloques:
+  W_EE = self._W[:N_E, :N_E]    # E -> E
+  W_EI = self._W[:N_E, N_E:]    # I -> E (negativo)
+  W_IE = self._W[N_E:, :N_E]    # E -> I
+  W_II = self._W[N_E:, N_E:]    # I -> I (negativo)
+
+8. GENERANDO VISUALIZACIONES...
+--------------------------------------------------------------------------------
+Figura guardada en: /home/molina/FAMAF/5to-Famaf/TESIS/pycloude/outputs/10_perfil_conectividad_w_learn.png
+
+================================================================================
+RESUMEN Y CONCLUSIONES
+================================================================================
+
+1. MAPEO DE ORIENTACIONES:
+   - 50 neuronas E y 50 neuronas I, cada una representa una orientación
+   - θ ∈ [0, π] radianes = [0°, 180°) = [-90°, 90°) centrado en 0°
+   - Espaciado uniforme: Δθ = 3.6°
+   - Neurona E[i] tiene la misma orientación que neurona I[i+50]
+
+2. TOPOLOGÍA DE ANILLO:
+   - Conectividad CIRCULANTE: W[i,j] depende solo de |θ_i - θ_j|
+   - Máxima conexión entre neuronas con orientación idéntica
+   - Conexión decae exponencialmente con diferencia angular
+
+3. MATRIZ w_learn:
+   - Shape: (100, 100)
+   - Bloques: [W_EE, W_EI; W_IE, W_II]
+   - W_EE, W_IE > 0 (excitatorio)
+   - W_EI, W_II < 0 (inhibitorio)
+
+4. FÓRMULA PARAMÉTRICA:
+   - W_XY(θ_i, θ_j) = a_XY * exp[(cos(2*(θ_i - θ_j)) - 1) / d_XY²]
+   - El factor 2 en cos(2*Δθ) es crucial: refleja periodicidad π
+   - Parámetros (a_XY, d_XY) fueron aprendidos mediante optimización
+
+5. CONVENCIÓN FUNDAMENTAL:
+   *** SIEMPRE USAMOS θ ∈ [0, π] EN EL CÓDIGO ***
+   - En Python: theta = np.linspace(0, np.pi, N_E, endpoint=False)
+   - Equivale a [-90°, 90°) si centramos en 0°
+   - Esta convención es consistente con el código original de Echeveste
+
+================================================================================
+ANÁLISIS COMPLETADO
+================================================================================

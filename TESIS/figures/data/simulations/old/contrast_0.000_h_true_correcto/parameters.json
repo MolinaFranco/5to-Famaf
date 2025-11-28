@@ -1,0 +1,14 @@
+{
+  "contrast": 0.0,
+  "noise_level": 0.0,
+  "n_neurons_e": 50,
+  "n_neurons_i": 50,
+  "simulation_time": 1000.0,
+  "dt": 0.2,
+  "burn_in": 200.0,
+  "use_three_phases": false,
+  "orientation": 0.0,
+  "u_E_mean": 0.03956685536174104,
+  "r_E_mean": 0.0019068710730172098,
+  "timestamp": "2025-11-14T07:38:44.732540"
+}

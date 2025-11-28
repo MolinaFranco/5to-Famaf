@@ -1,0 +1,104 @@
+======================================================================
+BENCHMARK DE ESCALABILIDAD: CPU vs GPU
+======================================================================
+GPU: cuda:0
+======================================================================
+
+Probando tamaños: [50, 100, 200, 400, 800, 1600]
+
+Benchmarking Matrix Multiplication...
+
+  Tamaño: 50x50
+    CPU: 2.96ms
+    GPU: 8.11ms
+    Speedup: 0.37x
+
+  Tamaño: 100x100
+    CPU: 1.90ms
+    GPU: 5.32ms
+    Speedup: 0.36x
+
+  Tamaño: 200x200
+    CPU: 2.38ms
+    GPU: 5.77ms
+    Speedup: 0.41x
+
+  Tamaño: 400x400
+    CPU: 4.16ms
+    GPU: 5.79ms
+    Speedup: 0.72x
+
+  Tamaño: 800x800
+    CPU: 11.99ms
+    GPU: 8.91ms
+    Speedup: 1.34x
+
+  Tamaño: 1600x1600
+    CPU: 65.55ms
+    GPU: 20.88ms
+    Speedup: 3.14x
+
+Benchmarking Complex Operations (Training-like)...
+
+  Tamaño: 50x50
+    CPU: 60.79ms
+    GPU: 118.57ms
+    Speedup: 0.51x
+
+  Tamaño: 100x100
+    CPU: 54.66ms
+    GPU: 128.72ms
+    Speedup: 0.42x
+
+  Tamaño: 200x200
+    CPU: 57.04ms
+    GPU: 113.50ms
+    Speedup: 0.50x
+
+  Tamaño: 400x400
+    CPU: 70.01ms
+    GPU: 121.98ms
+    Speedup: 0.57x
+
+  Tamaño: 800x800
+    CPU: 74.33ms
+    GPU: 124.63ms
+    Speedup: 0.60x
+
+  Tamaño: 1600x1600
+    CPU: 146.60ms
+    GPU: 149.08ms
+    Speedup: 0.98x
+
+======================================================================
+GENERANDO GRÁFICOS DE ESCALABILIDAD
+======================================================================
+
+✓ Gráfico guardado: pycloude/outputs/benchmark_escalabilidad_20251112_192922.png
+✓ Resultados guardados: pycloude/outputs/escalabilidad_results_20251112_192923.md
+
+======================================================================
+RESUMEN
+======================================================================
+
+Multiplicación Matricial:
+  50x  50: 0.37x  ✗ CPU
+  100x 100: 0.36x  ✗ CPU
+  200x 200: 0.41x  ✗ CPU
+  400x 400: 0.72x  ✗ CPU
+  800x 800: 1.34x  ✓ GPU
+  1600x1600: 3.14x  ✓ GPU
+
+Operaciones Complejas:
+  N=  50: 0.51x  ✗ CPU
+  N= 100: 0.42x  ✗ CPU
+  N= 200: 0.50x  ✗ CPU
+  N= 400: 0.57x  ✗ CPU
+  N= 800: 0.60x  ✗ CPU
+  N=1600: 0.98x  ✗ CPU
+
+======================================================================
+📊 Gráfico: pycloude/outputs/benchmark_escalabilidad_20251112_192922.png
+📄 Reporte: pycloude/outputs/escalabilidad_results_20251112_192923.md
+======================================================================
+

@@ -1,0 +1,117 @@
+======================================================================
+VERIFICACIÓN DE GPU
+======================================================================
+JAX version: 0.6.2
+Dispositivos JAX: [CudaDevice(id=0)]
+Backend por defecto: gpu
+GPU disponible: True
+======================================================================
+
+
+╔====================================================================╗
+║               BENCHMARK JAX: CPU vs GPU                            ║
+╚====================================================================╝
+
+
+######################################################################
+# Matrix Operations
+######################################################################
+
+--- CPU ---
+
+  Benchmark: Matrix Operations 100x100 (CPU)
+    8.182 ± 30.229ms
+
+--- GPU ---
+
+  Benchmark: Matrix Operations 100x100 (GPU)
+    14.050 ± 58.418ms
+
+🚀 Speedup: 0.58x
+
+######################################################################
+# Nonlinear Moments
+######################################################################
+
+--- CPU ---
+
+  Benchmark: Nonlinear Moments (CPU)
+    23.030 ± 93.309ms
+
+--- GPU ---
+
+  Benchmark: Nonlinear Moments (GPU)
+    47.312 ± 178.826ms
+
+🚀 Speedup: 0.49x
+
+######################################################################
+# ADF Evolution
+######################################################################
+
+--- CPU ---
+
+  Benchmark: ADF Evolution (CPU)
+    5.523 ± 12.168ms
+
+--- GPU ---
+
+  Benchmark: ADF Evolution (GPU)
+    15.020 ± 24.195ms
+
+🚀 Speedup: 0.37x
+
+######################################################################
+# Cost Computation
+######################################################################
+
+--- CPU ---
+
+  Benchmark: Cost Computation (CPU)
+    4.831 ± 13.889ms
+
+--- GPU ---
+
+  Benchmark: Cost Computation (GPU)
+    8.689 ± 29.689ms
+
+🚀 Speedup: 0.56x
+
+######################################################################
+# Posterior Analysis
+######################################################################
+
+--- CPU ---
+
+  Benchmark: Posterior Analysis (CPU)
+    126.472 ± 117.320ms
+
+--- GPU ---
+
+  Benchmark: Posterior Analysis (GPU)
+    368.798 ± 229.807ms
+
+🚀 Speedup: 0.34x
+
+======================================================================
+GENERANDO GRÁFICOS
+======================================================================
+
+✓ Gráfico guardado: pycloude/outputs/benchmark_jax_gpu_20251112_192750.png
+✓ Resultados guardados: pycloude/outputs/benchmark_jax_results_20251112_192750.md
+
+======================================================================
+RESUMEN FINAL
+======================================================================
+Matrix Operations        : 0.58x más rápido en GPU
+Nonlinear Moments        : 0.49x más rápido en GPU
+ADF Evolution            : 0.37x más rápido en GPU
+Cost Computation         : 0.56x más rápido en GPU
+Posterior Analysis       : 0.34x más rápido en GPU
+----------------------------------------------------------------------
+PROMEDIO                 : 0.47x más rápido en GPU
+======================================================================
+
+📊 Gráfico: pycloude/outputs/benchmark_jax_gpu_20251112_192750.png
+📄 Reporte: pycloude/outputs/benchmark_jax_results_20251112_192750.md
+

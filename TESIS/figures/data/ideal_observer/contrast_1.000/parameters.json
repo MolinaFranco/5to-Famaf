@@ -1,0 +1,10 @@
+{
+  "contrast": 1.0,
+  "n_neurons_e": 50,
+  "dominant_orientation": 0.0,
+  "seed": 42,
+  "u_E_mean_global": 2.999999636652031,
+  "u_E_std_global": 1.128638834941342,
+  "u_E_mean_max": 5.586414146717568,
+  "timestamp": "2025-11-21T05:46:03.023412"
+}

@@ -1,0 +1,206 @@
+======================================================================
+GENERACIÓN DE SIMULACIONES - H_TRUE CORRECTO
+======================================================================
+
+Este script genera simulaciones para todos los niveles
+de contraste usando h_true del código original de Echeveste.
+======================================================================
+
+CONFIGURACIÓN:
+  Neuronas: 50E + 50I
+  Tiempo: 1000.0 ms
+  dt: 0.2 ms
+  Burn-in: 200.0 ms
+  Ruido: 0.0
+
+Niveles de contraste: 5
+  - 0.000 (spontaneous) → h_true_0
+  - 0.125 (low) → h_true_1
+  - 0.250 (medium) → h_true_2
+  - 0.500 (high) → h_true_2
+  - 1.000 (very_high) → h_true_2
+
+======================================================================
+SIMULACIÓN: Contraste 0.0
+======================================================================
+
+Creando modelo...
+JAX configurado para GPU: cuda:0
+BrainPy configurado para GPU
+Cargando parámetros entrenados...
+Stage 1 parameters loaded from internal data loader
+Also loaded exact matrix: shape (100, 100)
+Stage 2 parameters loaded from internal data loader
+Model fully trained - both stages completed
+✓ Parámetros cargados
+
+Ejecutando simulación...
+Loaded pre-trained GSM data from GSMDataLoader
+Simulation: 1000.0ms (5000 steps)
+✓ Simulación completada: 5000 pasos temporales
+
+Calculando estadísticas del estado estacionario...
+  u_E mean: 0.039567
+  r_E mean: 0.001907
+
+Guardando en /home/molina/FAMAF/5to-Famaf/TESIS/figuras/data/simulations/contrast_0.000_h_true_correcto...
+✓ Datos guardados (NPZ)
+✓ Parámetros guardados (JSON)
+✓ Metadata guardada (TXT)
+
+✓ Simulación exitosa: spontaneous
+
+======================================================================
+SIMULACIÓN: Contraste 0.125
+======================================================================
+
+Creando modelo...
+JAX configurado para GPU: cuda:0
+BrainPy configurado para GPU
+Cargando parámetros entrenados...
+Stage 1 parameters loaded from internal data loader
+Also loaded exact matrix: shape (100, 100)
+Stage 2 parameters loaded from internal data loader
+Model fully trained - both stages completed
+✓ Parámetros cargados
+
+Ejecutando simulación...
+Loaded pre-trained GSM data from GSMDataLoader
+Simulation: 1000.0ms (5000 steps)
+✓ Simulación completada: 5000 pasos temporales
+
+Calculando estadísticas del estado estacionario...
+  u_E mean: 2.515028
+  r_E mean: 2.947916
+
+Guardando en /home/molina/FAMAF/5to-Famaf/TESIS/figuras/data/simulations/contrast_0.125_h_true_correcto...
+✓ Datos guardados (NPZ)
+✓ Parámetros guardados (JSON)
+✓ Metadata guardada (TXT)
+
+✓ Simulación exitosa: low
+
+======================================================================
+SIMULACIÓN: Contraste 0.25
+======================================================================
+
+Creando modelo...
+JAX configurado para GPU: cuda:0
+BrainPy configurado para GPU
+Cargando parámetros entrenados...
+Stage 1 parameters loaded from internal data loader
+Also loaded exact matrix: shape (100, 100)
+Stage 2 parameters loaded from internal data loader
+Model fully trained - both stages completed
+✓ Parámetros cargados
+
+Ejecutando simulación...
+Loaded pre-trained GSM data from GSMDataLoader
+Simulation: 1000.0ms (5000 steps)
+✓ Simulación completada: 5000 pasos temporales
+
+Calculando estadísticas del estado estacionario...
+  u_E mean: 3.464397
+  r_E mean: 4.576776
+
+Guardando en /home/molina/FAMAF/5to-Famaf/TESIS/figuras/data/simulations/contrast_0.250_h_true_correcto...
+✓ Datos guardados (NPZ)
+✓ Parámetros guardados (JSON)
+✓ Metadata guardada (TXT)
+
+✓ Simulación exitosa: medium
+
+======================================================================
+SIMULACIÓN: Contraste 0.5
+======================================================================
+
+Creando modelo...
+JAX configurado para GPU: cuda:0
+BrainPy configurado para GPU
+Cargando parámetros entrenados...
+Stage 1 parameters loaded from internal data loader
+Also loaded exact matrix: shape (100, 100)
+Stage 2 parameters loaded from internal data loader
+Model fully trained - both stages completed
+✓ Parámetros cargados
+
+Ejecutando simulación...
+Loaded pre-trained GSM data from GSMDataLoader
+Simulation: 1000.0ms (5000 steps)
+✓ Simulación completada: 5000 pasos temporales
+
+Calculando estadísticas del estado estacionario...
+  u_E mean: 3.467861
+  r_E mean: 4.581653
+
+Guardando en /home/molina/FAMAF/5to-Famaf/TESIS/figuras/data/simulations/contrast_0.500_h_true_correcto...
+✓ Datos guardados (NPZ)
+✓ Parámetros guardados (JSON)
+✓ Metadata guardada (TXT)
+
+✓ Simulación exitosa: high
+
+======================================================================
+SIMULACIÓN: Contraste 1.0
+======================================================================
+
+Creando modelo...
+JAX configurado para GPU: cuda:0
+BrainPy configurado para GPU
+Cargando parámetros entrenados...
+Stage 1 parameters loaded from internal data loader
+Also loaded exact matrix: shape (100, 100)
+Stage 2 parameters loaded from internal data loader
+Model fully trained - both stages completed
+✓ Parámetros cargados
+
+Ejecutando simulación...
+Loaded pre-trained GSM data from GSMDataLoader
+Simulation: 1000.0ms (5000 steps)
+✓ Simulación completada: 5000 pasos temporales
+
+Calculando estadísticas del estado estacionario...
+  u_E mean: 3.466249
+  r_E mean: 4.579250
+
+Guardando en /home/molina/FAMAF/5to-Famaf/TESIS/figuras/data/simulations/contrast_1.000_h_true_correcto...
+✓ Datos guardados (NPZ)
+✓ Parámetros guardados (JSON)
+✓ Metadata guardada (TXT)
+
+✓ Simulación exitosa: very_high
+
+======================================================================
+RESUMEN DE SIMULACIONES
+======================================================================
+
+Completadas: 5/5
+
+✓ Contraste 0.000 (spontaneous): SUCCESS
+    Directorio: contrast_0.000_h_true_correcto
+    u_E mean: 0.039567
+    r_E mean: 0.001907
+
+✓ Contraste 0.125 (low): SUCCESS
+    Directorio: contrast_0.125_h_true_correcto
+    u_E mean: 2.515028
+    r_E mean: 2.947916
+
+✓ Contraste 0.250 (medium): SUCCESS
+    Directorio: contrast_0.250_h_true_correcto
+    u_E mean: 3.464397
+    r_E mean: 4.576776
+
+✓ Contraste 0.500 (high): SUCCESS
+    Directorio: contrast_0.500_h_true_correcto
+    u_E mean: 3.467861
+    r_E mean: 4.581653
+
+✓ Contraste 1.000 (very_high): SUCCESS
+    Directorio: contrast_1.000_h_true_correcto
+    u_E mean: 3.466249
+    r_E mean: 4.579250
+
+======================================================================
+✓ TODAS LAS SIMULACIONES COMPLETADAS
+======================================================================
