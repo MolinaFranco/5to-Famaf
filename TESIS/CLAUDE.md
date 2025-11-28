@@ -2,6 +2,8 @@
 
 ## Code Style Requirements
 
+-**Its NOT necesary to run flake8 in the test directory: pycloude**
+
 - **ALWAYS run flake8 before committing any Python changes**
 - Follow PEP 8 style guidelines strictly
 - Maximum line length: 79 characters (flake8 default)
@@ -19,6 +21,8 @@ flake8 scikit-neuromsi/
 Fix ALL flake8 issues before proceeding.
 
 ## Project Structure
+
+- to run anything of the project you can use the virtualenv tesis with: workon tesis
 
 - Main package: scikit-neuromsi/
 - All files created for testing the changes maked, experimentation, or temporary purposes: pycloude/
