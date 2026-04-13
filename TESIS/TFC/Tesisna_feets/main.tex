@@ -1,0 +1,372 @@
+%\documentclass[spanish,a4paper,11pt,oneside,links]{report}
+\documentclass[spanish,a4paper,oneside,10pt,openright]{book}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish, es-tabla]{babel}
+\usepackage[Algoritmo]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{url}
+\usepackage{fancyhdr}
+\usepackage{epstopdf}
+\usepackage{minted}
+    \setminted{
+        autogobble,
+        breaklines=true,
+        linenos=true,
+    }
+    \usemintedstyle{pastie}
+\usepackage{csquotes}
+\usepackage{rotating}
+\usepackage{zref-xr}
+\usepackage{amssymb}
+\usepackage[pdfencoding=auto, psdextra]{hyperref}
+\usepackage{multicol}
+\usepackage{spverbatim}
+\usepackage[pdf]{graphviz}
+\usepackage{dirtree}
+\usepackage{tabularx}
+    \newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\usepackage{emptypage}
+\usepackage[acronym,toc,shortcuts,xindy]{glossaries}
+\usepackage{markdown}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{changepage}
+\usepackage{tcolorbox}
+\usepackage{siunitx}
+\usepackage{bold-extra}
+\usepackage[backend=biber,style=apa,natbib=true]{biblatex}
+\usepackage{svg}
+\usepackage{morewrites}
+\usepackage{aas_macros}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{floatpag}
+\usepackage{lipsum}
+
+%%%%% GLOSSARY START
+% Add new key for long Spanish form:
+\glsaddkey
+{longsp}% key
+{}% default value
+{\glsentrylongsp}% new command analogous to \glsentrylong
+{\Glsentrylongsp}% new command analogous to \Glsentrylong
+{\acrlongsp}% new command analogous to \acrlong
+{\Acrlongsp}% new command analogous to \Acrlong
+{\ACRlongsp}% new command analogous to \ACRlong
+
+% Add new key for plural long Spanish form:
+\glsaddkey
+{longplsp}% key
+{}% default value
+{\glsentrylongplsp}% new command analogous to \glsentrylongpl
+{\Glsentrylongplsp}% new command analogous to \Glsentrylongpl
+{\acrlongplsp}% new command analogous to \acrlongpl
+{\Acrlongplsp}% new command analogous to \Acrlongpl
+{\ACRlongplsp}% new command analogous to \ACRlongpl
+
+% Provide conditional to test if longsp/longplsp has been set
+\newcommand*{\glsifhaslongsp}[3]{%
+  \ifcsempty{glo@#1@longsp}{#3}{#2}%
+}
+\newcommand*{\glsifhaslongplsp}[3]{%
+  \ifcsempty{glo@#1@longplsp}{#3}{#2}%
+}
+
+% Define new acronym style:
+
+\newacronymstyle{spanish}
+{% base the display style on 'long-short'
+  \GlsUseAcrEntryDispStyle{long-short}%
+}%
+{% base the definitions on 'long-short'
+  \GlsUseAcrStyleDefs{long-short}%  
+% Make some custom modifications for the first use display.
+% Singular, no case change:
+  \renewcommand*{\genacrfullformat}[2]{%
+   \glsifhaslongsp{##1}%
+   {% has Spanish version:
+      \glsentrylongsp{##1}##2\space
+      (\firstacronymfont{\glsentryshort{##1}}, \glsentrylong{##1})%
+   }%
+   {%
+     \glsentrylong{##1}##2\space
+     (\firstacronymfont{\glsentryshort{##1}})%
+   }%
+  }%
+% Singular, first letter upper case:
+  \renewcommand*{\Genacrfullformat}[2]{%
+   \glsifhaslongsp{##1}%
+   {% has Spanish version:
+      \Glsentrylongsp{##1}##2\space
+      (\firstacronymfont{\glsentryshort{##1}}, \glsentrylong{##1})%
+   }%
+   {%
+     \Glsentrylong{##1}##2\space
+     (\firstacronymfont{\glsentryshort{##1}})%
+   }%
+  }%
+% Plural, no case change:
+  \renewcommand*{\genplacrfullformat}[2]{%
+   \glsifhaslongplsp{##1}%
+   {% has Spanish version:
+      \glsentrylongplsp{##1}##2\space
+      (\firstacronymfont{\glsentryshortpl{##1}}, \glsentrylongpl{##1})%
+   }%
+   {%
+     \glsentrylongpl{##1}##2\space
+     (\firstacronymfont{\glsentryshortpl{##1}})%
+   }%
+  }%
+% Plural, first letter upper case:
+  \renewcommand*{\Genplacrfullformat}[2]{%
+    \glsifhaslongplsp{##1}%
+    {% has Spanish version:
+      \Glsentrylongplsp{##1}##2\space
+      (\firstacronymfont{\glsentryshortpl{##1}}, \glsentrylongpl{##1})%
+    }%
+    {%
+      \Glsentrylongpl{##1}##2\space
+      (\firstacronymfont{\glsentryshortpl{##1}})%
+    }%
+  }%
+}
+
+% switch to the new style:
+\setacronymstyle{spanish}
+
+% Define a new glossary style that checks for the existence of
+% the longsp field.
+\newglossarystyle{listsp}{%
+  \setglossarystyle{list}% base style on the list style
+  \renewcommand*{\glossentry}[2]{%
+  \item[\glsentryitem{##1}%
+        \glstarget{##1}{\glossentryname{##1}}]
+    \glossentrydesc{##1}%
+    \glsifhaslongsp{##1}{\space(\glsentrylongsp{##1})}{}%
+    \glspostdescription\space ##2}%
+}
+%%%%% GLOSSARY END
+
+
+\addbibresource{tesis.bib} % Imports bibliography file
+
+% wide page for side by side figures, tables, etc
+\newlength{\offsetpage}
+\setlength{\offsetpage}{1.0cm}
+\newenvironment{widepage}{\begin{adjustwidth}{-\offsetpage}{-\offsetpage}%
+    \addtolength{\textwidth}{2\offsetpage}}%
+{\end{adjustwidth}}
+
+\newtheorem{definition}{Definición}
+
+\renewcommand{\listalgorithmname}{Índice de Algoritmos}
+
+\newenvironment{code}{\captionsetup{type=listing}}{}
+
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}  % in your preamble
+\DeclareMathOperator*{\argmin}{arg\,min}  % in your preamble
+
+\makeglossaries
+
+\input{acronimos}
+
+\lhead[]{\rightmark}
+\chead[]{}
+\rhead[\leftmark]{}
+\renewcommand{\headrulewidth}{0.5pt}
+
+\fancypagestyle{plain}{
+\fancyhead[L]{}
+\fancyhead[C]{}
+\fancyhead[R]{}
+\renewcommand{\headrulewidth}{0pt}
+}
+
+\pagestyle{fancy}
+
+\widowpenalty 10000
+\clubpenalty 10000
+
+\setlength{\headheight}{25.07225pt}
+
+
+% AGREGAGO POR JUAN =====================================================
+% COMANDOS DE CORRECCION
+\newcommand{\authorname}{{Felipe Clariá Dambolena}}
+\newcommand{\unc}{{Universidad Nacional de Córdoba}}
+\newcommand{\jbc}[1]{{\color{olive} #1 (JBC)\ }}
+\newcommand{\citeme}[1]{{\color{red}{¡¡CITEME: #1!!}}}
+\newcommand{\todo}[1]{{\color{red!75}{Completar: #1}}}
+
+% SNIPPETS DE CODIGO
+\providecommand*{\listingautorefname}{Código}
+\renewcommand{\listingscaption}{Código}
+\renewcommand{\thelisting}{\thesection.\arabic{listing}}
+\usepackage{etoolbox}
+\renewcommand{\thelisting}{\thesection.\arabic{listing}}
+\preto\section{\setcounter{listing}{0}}
+
+
+\begin{document}
+
+\input{./00_tapa/tapa.tex} \cleardoublepage
+
+
+\pagenumbering{gobble}
+Certifico que el trabajo incluido en este documento es el resultado de tareas de investigación originales y que no ha sido presentado para optar a un título de posgrado en ninguna otra Universidad o Institución.
+
+\vspace{3cm}
+\begin{flushright}
+\authorname
+\end{flushright}
+\cleardoublepage
+
+% RECONOCIMIENTS + AGRADECIMIENTOS ============================================
+
+\phantom{p. 1}
+\thispagestyle{empty}
+
+\chapter*{Reconocimientos}
+\pagenumbering{Roman} % para comenzar la numeracion de paginas en numeros romanos
+\addcontentsline{toc}{chapter}{Reconocimientos} % si queremos que aparezca en el índice
+\markboth{RECONOCIMIENTOS}{RECONOCIMIENTOS} % encabezado
+Este trabajo utilizó recursos computacionales de UNC Supercómputo (CCAD) de la \unc \footnote{\url{https://supercomputo.unc.edu.ar}}, que forman parte del Sistema Nacional de Computación de Alto Desempeño (SNCAD) de la República Argentina.
+
+\phantom{p. 1}
+\clearpage
+\thispagestyle{empty}
+\phantom{p. 2}
+\clearpage
+
+\chapter*{Agradecimientos} % si no queremos que añada la palabra "Capitulo"
+% \pagenumbering{Roman} % para comenzar la numeracion de paginas en numeros romanos
+\addcontentsline{toc}{chapter}{Agradecimientos} % si queremos que aparezca en el índice
+\markboth{AGRADECIMIENTOS}{AGRADECIMIENTOS} % encabezado
+\input{./01_agradecimientos/agradecimientos.tex}
+
+% ABSTRACT ====================================================================
+
+\phantom{p. 1}
+\clearpage
+\thispagestyle{empty}
+\phantom{p. 2}
+\clearpage
+
+\chapter*{Resumen} % si no queremos que añada la palabra "Capitulo"
+\addcontentsline{toc}{chapter}{Resumen} % si queremos que aparezca en el índice
+\markboth{RESUMEN}{RESUMEN} % encabezado
+\input{./02_resumen/resumen_es.tex}
+
+\phantom{p. 1}
+\clearpage
+\thispagestyle{empty}
+
+\chapter*{Abstract} % si no queremos que añada la palabra "Capitulo"
+\addcontentsline{toc}{chapter}{Abstract} % si queremos que aparezca en el índice
+\markboth{ABSTRACT}{ABSTRACT} % encabezado
+\input{./02_resumen/resumen_en.tex}
+
+\phantom{p. 1}
+\thispagestyle{empty}
+
+
+% GLOSARIO=====================================================================
+
+\renewcommand*\glspostdescription{\dotfill}
+\setlength{\glslistdottedwidth}{1\textwidth}
+\setlength{\glsdescwidth}{0.89\textwidth}
+\markboth{Glosario}{Glosario} % encabezado
+\glsaddall
+\printglossary[type=\acronymtype,title=Glosario]
+\addcontentsline{toc}{chapter}{Glosario}
+
+
+% CONTENIDOS ==================================================================
+\phantom{p. 1}
+\clearpage
+
+\tableofcontents % indice de contenidos
+
+\phantom{p. 1}
+\thispagestyle{empty}
+
+% FIGURES =====================================================================
+
+\cleardoublepage
+\listoffigures % indice de figuras
+\addcontentsline{toc}{chapter}{Índice de figuras} % para que aparezca en el indice de contenidos
+
+% \phantom{p. 1}
+% \thispagestyle{empty}
+% \phantom{p. 1}
+% \clearpage
+
+% %%%%
+
+% \phantom{p. 1}
+% \clearpage
+% \thispagestyle{empty}
+% \phantom{p. 2}
+% \clearpage
+
+% \chapter*{Resumen} % si no queremos que añada la palabra "Capitulo"
+% \addcontentsline{toc}{chapter}{Resumen} % si queremos que aparezca en el índice
+% \markboth{RESUMEN}{RESUMEN} % encabezado
+% \input{./02_resumen/resumen_es.tex}
+
+% \phantom{p. 1}
+% \clearpage
+% \thispagestyle{empty}
+
+% \chapter*{Abstract} % si no queremos que añada la palabra "Capitulo"
+% \addcontentsline{toc}{chapter}{Abstract} % si queremos que aparezca en el índice
+% \markboth{ABSTRACT}{ABSTRACT} % encabezado
+% \input{./02_resumen/resumen_en.tex}
+
+% \phantom{p. 1}
+% \thispagestyle{empty}
+
+% TABLES ======================================================================
+
+% \cleardoublepage
+% \listoftables % indice de tablas
+% \addcontentsline{toc}{chapter}{Índice de tablas} % para que aparezca en el indice de contenidos
+
+% % pagina en blanco
+% \newpage
+
+\phantom{p. 1}
+\clearpage
+\pagenumbering{arabic}
+
+
+% CONTENT =====================================================================
+
+\input{./03_intro/intro.tex} \cleardoublepage
+\input{./04_antecedentes/antecedentes.tex} \cleardoublepage
+\input{./05_feets/feets.tex} \cleardoublepage
+\input{./06_parallel/parallel.tex} \cleardoublepage
+\input{./07_refactoring/refactoring.tex} \cleardoublepage
+\input{./08_resultados/resultados.tex} \cleardoublepage
+\input{./09_conclusiones/conclusiones.tex}
+
+% APENDICES====================================================================
+
+% \appendix
+
+
+% BIBLIOGRAFIA ================================================================
+
+\phantom{p. 1}
+\printbibliography
+\addcontentsline{toc}{chapter}{Bibliografía}
+
+\end{document}
+

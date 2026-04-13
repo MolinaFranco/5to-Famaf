@@ -50,10 +50,10 @@ SIMULATION_CONFIG = {
 # Niveles de contraste a simular
 # NOTA: El modelo mapea automáticamente estos valores a h_true_0, h_true_1, h_true_2
 CONTRAST_LEVELS = [
-    # {'contrast': 0.0, 'label': 'spontaneous', 'h_true_file': 'h_true_0'},
-    # {'contrast': 0.125, 'label': 'low', 'h_true_file': 'h_true_1'},
-    # {'contrast': 0.25, 'label': 'medium', 'h_true_file': 'h_true_2'},
-    # {'contrast': 0.5, 'label': 'high', 'h_true_file': 'h_true_3'},
+    {'contrast': 0.0, 'label': 'spontaneous', 'h_true_file': 'h_true_0'},
+    {'contrast': 0.125, 'label': 'low', 'h_true_file': 'h_true_1'},
+    {'contrast': 0.25, 'label': 'medium', 'h_true_file': 'h_true_2'},
+    {'contrast': 0.5, 'label': 'high', 'h_true_file': 'h_true_3'},
     {'contrast': 1.0, 'label': 'very_high', 'h_true_file': 'h_true_4'},
 ]
 

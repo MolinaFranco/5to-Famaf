@@ -1,0 +1,59 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#fafafa', 'primaryTextColor': '#212121', 'primaryBorderColor': '#616161', 'lineColor': '#424242'}}}%%
+
+flowchart TB
+    subgraph SKNEUROMSI["scikit-neuromsi"]
+        direction TB
+
+        subgraph CORE["core/"]
+            SKNMSIMethodABC["SKNMSIMethodABC<br/><i>Clase base abstracta</i>"]
+            NDResult["NDResult<br/><i>Contenedor de resultados</i>"]
+        end
+
+        subgraph NEURAL["neural/"]
+            direction TB
+            Echeveste2020["<b>echeveste2020.py</b><br/>SSNIntegrator<br/>Echeveste2020<br/><i>Simulacion y entrenamiento</i>"]
+
+            EchevesteTraining["<b>echeveste_training.py</b><br/>compute_nonlinear_moments<br/>evolve_moments<br/>compute_cost_components<br/><i>Funciones JAX</i>"]
+
+            EchevesteVis["<b>echeveste_visualization.py</b><br/>plot_membrane_potentials<br/>plot_firing_rates<br/>plot_power_spectrum<br/><i>Visualizacion</i>"]
+
+            DeviceConfig["<b>device_config.py</b><br/><i>Config GPU/CPU</i>"]
+        end
+
+        subgraph GENERATIVE["generative/"]
+            GSM["<b>gsm.py</b><br/>GSM<br/>generate_gabor_filters<br/>create_echeveste_gsm<br/><i>Modelo Generativo</i>"]
+        end
+
+        subgraph DATA["data/"]
+            EchevesteLoader["<b>echeveste_data_loader.py</b><br/>EchevesteDataLoader<br/><i>Carga parametros SSN</i>"]
+
+            GSMLoader["<b>gsm_data_loader.py</b><br/>GSMDataLoader<br/><i>Carga filtros y covarianza</i>"]
+
+            subgraph DATAFILES["Archivos de datos"]
+                EchevesteData["echeveste2020/<br/>w_learn, sigma_eta<br/>h_true_*, target_*"]
+                GSMData["gsm/<br/>A, C, x_*, h_*"]
+            end
+        end
+    end
+
+    %% Relaciones principales
+    SKNMSIMethodABC --> Echeveste2020
+    Echeveste2020 --> NDResult
+
+    Echeveste2020 --> EchevesteTraining
+    Echeveste2020 --> EchevesteLoader
+    Echeveste2020 --> GSM
+    Echeveste2020 --> DeviceConfig
+    Echeveste2020 -.-> EchevesteVis
+
+    GSM --> GSMLoader
+    EchevesteLoader --> EchevesteData
+    GSMLoader --> GSMData
+
+    %% Estilos en grises
+    style SKNEUROMSI fill:#f5f5f5,stroke:#424242,stroke-width:2px
+    style CORE fill:#e0e0e0,stroke:#616161
+    style NEURAL fill:#eeeeee,stroke:#757575
+    style GENERATIVE fill:#e8e8e8,stroke:#757575
+    style DATA fill:#f0f0f0,stroke:#757575
+    style DATAFILES fill:#fafafa,stroke:#9e9e9e

@@ -1,0 +1,67 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#fff3e0', 'primaryTextColor': '#e65100'}}}%%
+
+flowchart TB
+    subgraph GSM_MODEL["GSM: Gaussian Scale Mixture Model"]
+        direction TB
+
+        subgraph GENERATION["Generación de Estímulos (Eq. 1-2)"]
+            Y["y ~ N(0, C)\nLatent orientation\n(50 dims)"]
+            Z["z ~ p(z)\nContrast scalar"]
+            A["A: Gabor Filters\n(256 x 50)"]
+            NOISE["ε ~ N(0, σ_x²·I)\nObservation noise"]
+
+            Y --> MUL1["×"]
+            Z --> MUL1
+            MUL1 --> AY["z·y"]
+            AY --> MUL2["A @ (z·y)"]
+            A --> MUL2
+            MUL2 --> ADD["+ ε"]
+            NOISE --> ADD
+            ADD --> X["x: Image patch\n(256 dims)"]
+        end
+
+        subgraph H_TRANSFORM["Transformación a Input SSN"]
+            X --> WFF["W_ff @ x\nW_ff = A.T / 15"]
+            WFF --> HVEC["h_vec: Raw filter response\n(50 dims)"]
+
+            subgraph NONLIN["Transformación No Lineal"]
+                HVEC --> BETA["+ β_h\n(baseline = 0.10)"]
+                BETA --> RELU["max(·, 0)\n(ReLU threshold)"]
+                RELU --> GAMMA["^γ_h\n(power = 2.03)"]
+                GAMMA --> ALPHA["× α_h\n(scale = 1.96)"]
+            end
+
+            ALPHA --> H_E["h_E: SSN input E\n(50 dims)"]
+            H_E --> DUP["Duplicar"]
+            DUP --> H_FULL["h = [h_E; h_E]\nSSN full input\n(100 dims)"]
+        end
+
+        subgraph POSTERIOR["Cálculo de Posterior (Target)"]
+            X2["x"] --> POST_CALC["P(y|x,z)"]
+            Z2["z (MAP)"] --> POST_CALC
+
+            POST_CALC --> MU_POST["μ_post = (z/σ_x²)·Σ_post·A^T·x"]
+            POST_CALC --> SIGMA_POST["Σ_post = [C⁻¹ + (z²/σ_x²)·A^T·A]⁻¹"]
+
+            MU_POST --> TARGET_MU["Target: μ_GSM\n(50 dims)"]
+            SIGMA_POST --> TARGET_SIGMA["Target: Σ_GSM\n(50 x 50)"]
+        end
+    end
+
+    subgraph SSN_MODEL["SSN: Stabilized Supralinear Network"]
+        H_FULL --> SSN_INPUT["Input h"]
+        TARGET_MU --> COST["Función de Costo\nL = λ_μ·||μ_SSN - μ_GSM||²\n  + λ_σ·||var_SSN - var_GSM||²\n  + λ_Σ·||Σ_SSN - Σ_GSM||²"]
+        TARGET_SIGMA --> COST
+
+        SSN_INPUT --> DYNAMICS["τ·du/dt = -u + W·r + h + η"]
+        DYNAMICS --> SSN_OUTPUT["Estadísticas SSN:\nμ_SSN, Σ_SSN"]
+        SSN_OUTPUT --> COST
+    end
+
+    %% Estilos
+    style GSM_MODEL fill:#fff8e1,stroke:#ff9800,stroke-width:2px
+    style GENERATION fill:#ffecb3,stroke:#ffa000
+    style H_TRANSFORM fill:#ffe0b2,stroke:#ff9800
+    style NONLIN fill:#ffcc80,stroke:#f57c00
+    style POSTERIOR fill:#ffecb3,stroke:#ffa000
+    style SSN_MODEL fill:#e3f2fd,stroke:#1976d2,stroke-width:2px

@@ -1,0 +1,87 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f5e9', 'primaryTextColor': '#1b5e20'}}}%%
+
+flowchart TB
+    subgraph ADF["Assumed Density Filtering (ADF)"]
+        direction TB
+
+        subgraph INPUT["Inputs"]
+            W["W: Connectivity\n(100 x 100)"]
+            H["h: External input\n(100)"]
+            SIGMA_ETA["Σ_η: Noise covariance\n(100 x 100)"]
+            TAUS["τ_E=20ms, τ_I=10ms"]
+        end
+
+        subgraph INIT["Estado Inicial"]
+            MU0["μ(0) = 0\n(100)"]
+            SIGMA0["Σ(0) = 0\n(100 x 100)"]
+            SIGMASTAR0["Σ*(0) = 0\n(100 x 100)"]
+        end
+
+        subgraph NONLIN_MOMENTS["Momentos No Lineales (Eqs. S15-S17)"]
+            direction LR
+            MU_IN["μ"] --> RATIO["μ/σ"]
+            SIGMA_IN["σ = √diag(Σ)"] --> RATIO
+            RATIO --> PHI["φ(μ/σ) = PDF"]
+            RATIO --> PSI["Ψ(μ/σ) = CDF"]
+
+            PHI --> NU1["ν₁ = μ·Ψ + σ·φ\n(E[[u]₊])"]
+            PSI --> NU1
+
+            NU1 --> NU["ν = k·(μ·ν₁ + σ²·Ψ)\n(E[r] = E[k·[u]₊²])"]
+            NU1 --> GAMMA_OUT["γ = 2k·ν₁\n(∂E[r]/∂μ)"]
+        end
+
+        subgraph JACOBIAN["Matriz Jacobiana"]
+            GAMMA_OUT --> J["J = diag(1/τ)·(W·diag(γ) - I)"]
+            W --> J
+            TAUS --> J
+        end
+
+        subgraph EVOLUTION["Evolución Temporal"]
+            direction TB
+
+            subgraph EQ17["Eq. 17: Evolución de μ"]
+                DMU["dμ/dt = (1/τ)·(-μ + W·ν + h)"]
+            end
+
+            subgraph EQ19["Eq. 19: Evolución de Σ*"]
+                DSIGMASTAR["dΣ*/dt = -(1/τ_η)·Σ* + J·Σ* + diag(1/τ)·Σ_η"]
+            end
+
+            subgraph EQ18["Eq. 18: Evolución de Σ"]
+                DSIGMA["dΣ/dt = J·Σ + Σ·J^T + (1/τ)·(Σ* + Σ*^T)"]
+            end
+
+            EQ17 --> INT["Integración Euler\ndt = 0.2ms"]
+            EQ18 --> INT
+            EQ19 --> INT
+        end
+
+        subgraph OUTPUT["Outputs"]
+            INT --> MU_OUT["μ(T): Media SSN\n(100)"]
+            INT --> SIGMA_OUT["Σ(T): Covarianza SSN\n(100 x 100)"]
+        end
+
+        subgraph COST["Función de Costo (Eq. 25)"]
+            MU_OUT --> LOSS
+            SIGMA_OUT --> LOSS
+            TARGETS["μ_GSM, Σ_GSM\n(targets)"] --> LOSS
+
+            LOSS["L = λ_μ·‖μ_SSN - μ_GSM‖²\n  + λ_σ·‖diag(Σ_SSN) - diag(Σ_GSM)‖²\n  + λ_Σ·‖Σ_SSN - Σ_GSM‖²_F\n  + λ_slow·slowness"]
+        end
+    end
+
+    %% Conexiones principales
+    INPUT --> INIT
+    MU0 --> MU_IN
+    SIGMA0 --> SIGMA_IN
+    J --> EVOLUTION
+    NU --> DMU
+    H --> DMU
+    SIGMA_ETA --> DSIGMASTAR
+
+    %% Estilos
+    style ADF fill:#f1f8e9,stroke:#558b2f,stroke-width:2px
+    style NONLIN_MOMENTS fill:#dcedc8,stroke:#7cb342
+    style EVOLUTION fill:#c5e1a5,stroke:#8bc34a
+    style COST fill:#aed581,stroke:#689f38

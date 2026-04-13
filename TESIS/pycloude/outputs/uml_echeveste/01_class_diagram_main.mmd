@@ -1,0 +1,176 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e1f5fe', 'primaryTextColor': '#01579b', 'primaryBorderColor': '#0288d1', 'lineColor': '#0288d1', 'secondaryColor': '#fff3e0', 'tertiaryColor': '#f3e5f5'}}}%%
+
+classDiagram
+    direction TB
+
+    %% ============================================
+    %% CLASE BASE ABSTRACTA
+    %% ============================================
+    class SKNMSIMethodABC {
+        <<abstract>>
+        +_model_name: str
+        +_model_type: str
+        +_run_input: list
+        +_run_output: list
+        +run()* NDResult
+        +set_random(rng)
+    }
+
+    %% ============================================
+    %% CLASE PRINCIPAL SSN
+    %% ============================================
+    class Echeveste2020 {
+        -_N_E: int = 50
+        -_N_I: int = 50
+        -_position_range: tuple
+        -_time_range: tuple
+        -_time_res: float
+        -_integrator: bp.odeint
+
+        ~~Connectivity Parameters~~
+        -_a_EE, _a_EI, _a_IE, _a_II: float
+        -_d_EE, _d_EI, _d_IE, _d_II: float
+        -_W_EE, _W_EI, _W_IE, _W_II: ndarray
+        -_W_exact: ndarray
+
+        ~~Input Transform Parameters~~
+        -_input_scaling: float  α_h
+        -_input_baseline: float β_h
+        -_input_nl_pow: float   γ_h
+
+        ~~Noise Parameters~~
+        -_Sigma_eta: ndarray
+        -_noise_params: dict
+
+        ~~Training State~~
+        -_is_trained: bool
+        -_stage1_completed: bool
+        -_stage2_completed: bool
+
+        +__init__(N_E, N_I, tau_e, tau_i, ...)
+        +train(gsm_model, stage1_params, stage2_params)
+        -_optimize_stage1(gsm_model, params)
+        -_optimize_stage2(gsm_model, params)
+        +run(stimulus_contrast, stimulus_orientation, ...) NDResult
+        +burn_in(h_input, duration_ms, ...)
+        +load_parameters(load_exact_matrices)
+        +save_parameters(output_dir, save_matrices)
+        +build_connectivity_matrix(connectivity_params)
+        +calculate_causes(result, ...) dict
+        +generate_stimulus_from_gsm(contrast, n_samples)
+        -_build_noise_covariance(width, std_e, std_i, rho)
+        -_build_parametric_matrix(theta_pre, theta_post, a, d)
+        -_compute_nonlinear_moments(mu, sigma)
+        -_generate_gsm_stimulus(contrast, orientation, ...)
+        -_extract_posterior_distribution(result, ...)
+    }
+
+    %% ============================================
+    %% INTEGRADOR SSN (Dataclass)
+    %% ============================================
+    class SSNIntegrator {
+        <<dataclass>>
+        +tau_e: float
+        +tau_i: float
+        +tau_n: float
+        +n: float = 2.0
+        +k: float = 0.3
+        +name: str
+
+        +supralinear_activation(u) ndarray
+        +__call__(u_e, u_i, t, W, h, eta) tuple
+    }
+
+    %% ============================================
+    %% MODELO GENERATIVO GSM
+    %% ============================================
+    class GSM {
+        +patch_size: int = 16
+        +n_orientations: int = 50
+        +h_scale: float = 1/15
+        +noise_variance: float = 100.0
+
+        ~~Matrices~~
+        +A: ndarray  Gabor filters
+        +C: ndarray  Prior covariance
+        +C_inv: ndarray
+        +W_ff: ndarray  Feedforward weights
+        +ATA: ndarray
+
+        ~~Transform Parameters~~
+        +alpha_h: float = 1.96
+        +beta_h: float = 0.10
+        +gamma_h: float = 2.03
+
+        +__init__(patch_size, n_orientations, ...)
+        +generate_stimulus_patch(contrast, add_noise, ...) dict
+        +generate_h_input_efficient(x) ndarray
+        +generate_h_input_raw(x) ndarray
+        +generate_bump_stimulus(dominant_orientation_idx, ...) ndarray
+        +generate_stimulus_from_y(y, contrast, add_noise) ndarray
+        +compute_posterior_moments(x, z_map, add_baseline) tuple
+        +compute_posterior_for_ssn_training(contrast, n_samples, ...) dict
+        +load_precomputed_h_transformed(contrast_idx) ndarray
+        +compute_input_baseline_lb(stimuli, n_samples, contrasts) float
+        -_load_pretrained_data()
+        -_generate_new_data()
+    }
+
+    %% ============================================
+    %% DATA LOADERS
+    %% ============================================
+    class EchevesteDataLoader {
+        +data_path: Path
+
+        +__init__()
+        +load_gabor_filters() ndarray
+        +load_prior_covariance() ndarray
+        +load_ssn_connectivity_parameters() dict
+        +load_input_transformation_parameters() dict
+        +load_noise_variance_parameters() dict
+        +load_noise_covariance_matrix() ndarray
+        +load_full_connectivity_matrix() ndarray
+        +load_h_vec(contrast_idx) ndarray
+        +load_target_moments(contrast_idx) dict
+    }
+
+    class GSMDataLoader {
+        +data_path: Path
+
+        +__init__()
+        +load_gabor_filters() ndarray
+        +load_prior_covariance() ndarray
+        +load_contrast_levels() ndarray
+        +load_stimulus(contrast_idx) tuple
+        +load_all_stimuli(indices) dict
+        +load_transformation_parameters() dict
+        +load_h_vec_transformed(contrast_idx) ndarray
+        +load_target_mean(contrast_idx) ndarray
+        +load_target_covariance(contrast_idx) ndarray
+    }
+
+    %% ============================================
+    %% RESULTADO
+    %% ============================================
+    class NDResult {
+        <<from core>>
+        +times_: ndarray
+        +positions_: ndarray
+        +extra_: dict
+        +get_modes() DataFrame
+        +to_xarray() Dataset
+    }
+
+    %% ============================================
+    %% RELACIONES
+    %% ============================================
+    SKNMSIMethodABC <|-- Echeveste2020 : inherits
+    Echeveste2020 *-- SSNIntegrator : contains
+    Echeveste2020 ..> GSM : uses for training
+    Echeveste2020 ..> EchevesteDataLoader : loads parameters
+    Echeveste2020 ..> NDResult : returns
+    GSM ..> GSMDataLoader : loads data
+
+    note for Echeveste2020 "Modelo SSN principal\nEq. 8-9 del paper\nEntrenamiento en 2 etapas"
+    note for GSM "Modelo Generativo\nEq. 1-7 del paper\nGenera inputs h para SSN"
+    note for SSNIntegrator "Ecuaciones diferenciales\nτ·du/dt = -u + W·r + h + η"

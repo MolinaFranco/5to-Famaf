@@ -1,0 +1,131 @@
+VALIDACION EXHAUSTIVA - 2026-01-27 03:00:58.681195
+N_SAMPLES = 10000
+======================================================================
+
+
+1. Distribucion Normal
+--------------------------------------------------
+  f1 (PDF): 0.00e+00 [PASS]
+    Original: methods.py:13
+    Nuestra:  _gsm.py
+    Samples:  10000
+  f2_exact (CDF): 0.00e+00 [PASS]
+    Original: methods.py:16
+    Nuestra:  _gsm.py
+    Samples:  10000
+
+2. Activacion Neuronal
+--------------------------------------------------
+  get_r (activacion): 0.00e+00 [PASS]
+    Original: methods.py:43
+    Nuestra:  _echeveste2020.py:63
+    Samples:  10000
+  get_r_prime (derivada): 0.00e+00 [PASS]
+    Original: methods.py:51
+    Nuestra:  _echeveste2020.py
+    Samples:  10000
+
+3. Momentos (nu, gamma)
+--------------------------------------------------
+  nu_recursive (n=2): 7.11e-15 [PASS]
+    Original: methods.py:98
+    Nuestra:  _echeveste2020.py
+    Samples:  10000
+  get_gamma: 0.00e+00 [PASS]
+    Original: methods.py:146
+    Nuestra:  _echeveste2020.py
+    Samples:  10000
+  nu_recursive (n=0): 0.00e+00 [PASS]
+    Original: methods.py:99
+    Nuestra:  direct
+    Samples:  10000
+  nu_recursive (n=1): 0.00e+00 [PASS]
+    Original: methods.py:101
+    Nuestra:  direct
+    Samples:  10000
+
+4. Evolucion Temporal
+--------------------------------------------------
+  new_u (Euler step): 0.00e+00 [PASS]
+    Original: methods.py:289
+    Nuestra:  _echeveste2020.py
+    Samples:  10000
+  mu_dot (mean deriv): 0.00e+00 [PASS]
+    Original: methods.py:322
+    Nuestra:  _echeveste2020.py
+    Samples:  10000
+  u_dot_det (deterministic): 0.00e+00 [PASS]
+    Original: methods.py:292
+    Nuestra:  _echeveste2020.py
+    Samples:  10000
+
+5. Conectividad Parametrica
+--------------------------------------------------
+  parametric_kernel (Eq.10): 0.00e+00 [PASS]
+    Original: Eq.10 paper
+    Nuestra:  _echeveste2020.py:1404
+    Samples:  10000
+  get_J (Jacobian): 0.00e+00 [PASS]
+    Original: methods.py:128
+    Nuestra:  _echeveste2020.py
+    Samples:  10000
+
+6. Ruido (O-U Process)
+--------------------------------------------------
+  eps_1 (O-U decay): 1.11e-16 [PASS]
+    Original: methods.py:390
+    Nuestra:  _echeveste2020.py
+    Samples:  10000
+  eps_2 (O-U noise): 1.11e-16 [PASS]
+    Original: methods.py:391
+    Nuestra:  _echeveste2020.py
+    Samples:  10000
+  O-U update step: 0.00e+00 [PASS]
+    Original: methods.py:396
+    Nuestra:  _echeveste2020.py
+    Samples:  10000
+
+7. GSM (Posterior)
+--------------------------------------------------
+  get_Sigma_z (post cov): 0.00e+00 [PASS]
+    Original: GSM.py:111
+    Nuestra:  _gsm.py:789
+    Samples:  10000
+  get_mu_z (post mean): 0.00e+00 [PASS]
+    Original: GSM.py:107
+    Nuestra:  _gsm.py:789
+    Samples:  5000
+  get_x (stimulus): 0.00e+00 [PASS]
+    Original: GSM.py:95
+    Nuestra:  _gsm.py:303
+    Samples:  10000
+  P_z (gamma dist): 0.00e+00 [PASS]
+    Original: GSM.py:204
+    Nuestra:  _gsm.py
+    Samples:  10000
+
+8. Funciones Auxiliares
+--------------------------------------------------
+  sqr_norm: 0.00e+00 [PASS]
+    Original: methods.py:20
+    Nuestra:  direct
+    Samples:  10000
+  rel_error: 0.00e+00 [PASS]
+    Original: methods.py:1116
+    Nuestra:  direct
+    Samples:  10000
+  rescale: 0.00e+00 [PASS]
+    Original: methods.py:24
+    Nuestra:  direct
+    Samples:  100000
+  rel_dist: 0.00e+00 [PASS]
+    Original: methods.py:27
+    Nuestra:  direct
+    Samples:  10000
+  Mat_from_Chol: 0.00e+00 [PASS]
+    Original: methods.py:269
+    Nuestra:  direct
+    Samples:  10000
+
+======================================================================
+TOTAL: 25/25 tests pasados

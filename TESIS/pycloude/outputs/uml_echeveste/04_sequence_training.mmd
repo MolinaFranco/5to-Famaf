@@ -1,0 +1,95 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'actorLineColor': '#1976d2', 'signalColor': '#1976d2'}}}%%
+
+sequenceDiagram
+    autonumber
+    participant User
+    participant SSN as Echeveste2020
+    participant GSM as GSM Model
+    participant S1 as Stage 1<br/>(ADAM + Sampling)
+    participant S2 as Stage 2<br/>(L-BFGS-B + ADF)
+    participant Loader as EchevesteDataLoader
+
+    Note over User,Loader: FLUJO DE ENTRENAMIENTO - Echeveste et al. (2020)
+
+    %% Inicialización
+    rect rgb(227, 242, 253)
+        Note over User,SSN: INICIALIZACIÓN
+        User->>SSN: __init__(N_E=50, N_I=50, tau_e=20ms, ...)
+        SSN->>SSN: Crear SSNIntegrator(tau_e, tau_i, n=2, k=0.3)
+        SSN->>SSN: Inicializar parámetros (a_XY, d_XY = None)
+    end
+
+    %% Carga de parámetros preentrenados (alternativa)
+    rect rgb(255, 243, 224)
+        Note over User,Loader: ALTERNATIVA: CARGAR PARÁMETROS PREENTRENADOS
+        User->>SSN: load_parameters()
+        SSN->>Loader: load_ssn_connectivity_parameters()
+        Loader-->>SSN: {a_EE, a_EI, ..., d_EE, d_EI, ...}
+        SSN->>Loader: load_noise_variance_parameters()
+        Loader-->>SSN: {var_e, var_i, var_width, rho}
+        SSN->>Loader: load_full_connectivity_matrix()
+        Loader-->>SSN: W (100x100)
+        SSN->>SSN: _is_trained = True
+    end
+
+    %% Entrenamiento
+    rect rgb(232, 245, 233)
+        Note over User,S2: ENTRENAMIENTO COMPLETO
+
+        User->>SSN: train(gsm_model, stage1_params, stage2_params)
+
+        %% Stage 1
+        rect rgb(200, 230, 201)
+            Note over SSN,S1: STAGE 1: ADAM con muestreo estocástico
+            SSN->>GSM: generate_stimulus_patch(contrast)
+            GSM-->>SSN: {x, y, z}
+            SSN->>GSM: generate_h_input_raw(x)
+            GSM-->>SSN: h_vec (sin transformar)
+
+            SSN->>S1: _optimize_stage1(gsm_model, params)
+            Note over S1: N_trial = 50 muestras por iteración
+            Note over S1: 250 iteraciones ADAM
+            Note over S1: Annealing: T_min: 0 → T_max-50ms
+
+            loop Para cada iteración ADAM
+                S1->>S1: simulate_ssn_with_noise(W, h, Σ_η, ...)
+                S1->>S1: compute_costs_with_samples(...)
+                S1->>S1: Actualizar parámetros con gradientes
+            end
+
+            S1-->>SSN: Parámetros optimizados (connectivity + input transform)
+            SSN->>SSN: _stage1_completed = True
+        end
+
+        %% Stage 2
+        rect rgb(178, 223, 219)
+            Note over SSN,S2: STAGE 2: L-BFGS-B con ADF determinístico
+            SSN->>S2: _optimize_stage2(gsm_model, params)
+            Note over S2: Ventana fija: T_max - 50ms
+            Note over S2: ADF: evolución de momentos (μ, Σ)
+
+            loop Para cada evaluación L-BFGS-B
+                S2->>S2: evolve_moments(W, h, Σ_η, ...)
+                Note over S2: dμ/dt = (1/τ)·(-μ + W·ν + h)
+                Note over S2: dΣ/dt = J·Σ + Σ·J^T + ...
+                S2->>S2: compute_cost_components(μ_SSN, Σ_SSN, μ_target, Σ_target)
+                S2->>S2: Calcular gradientes con JAX autodiff
+            end
+
+            S2-->>SSN: Parámetros finales optimizados
+            SSN->>SSN: _stage2_completed = True
+        end
+
+        SSN->>SSN: _is_trained = True
+        SSN-->>User: Modelo entrenado
+    end
+
+    %% Simulación
+    rect rgb(252, 228, 236)
+        Note over User,SSN: SIMULACIÓN
+        User->>SSN: run(stimulus_contrast, stimulus_orientation, ...)
+        SSN->>GSM: generate_stimulus_from_gsm(contrast)
+        GSM-->>SSN: h_input
+        SSN->>SSN: Integrar τ·du/dt = -u + W·r + h + η
+        SSN-->>User: NDResult (potenciales, firing rates, ...)
+    end

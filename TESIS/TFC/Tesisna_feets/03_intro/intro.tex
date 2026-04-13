@@ -1,0 +1,31 @@
+\chapter{Introducción}
+\label{chapter:intro}
+El desarrollo de modernos telescopios y satélites ha posibilitado la realización de relevamientos astronómicos a una escala sin precedentes, lo que ha generado un aumento exponencial tanto en la cantidad como en la calidad de los datos disponibles para su procesamiento, almacenamiento y análisis \citep{cavuoti2013datarichastronomyminingsynoptic}. Entre ellos, el relevamiento \gls{vvv} llevó a cabo un censo exhaustivo de estrellas en el disco y bulbo galáctico durante un período de cinco años \citep{minniti2010vvv}, utilizando el telescopio infrarrojo \gls{vista}, ubicado en el Cerro Paranal, Chile.
+
+El \gls{vvv} produjo un volumen de datos superior a los $\SI{300}{\giga\byte}$ por noche, organizados en unidades de observación denominadas \emph{tiles}, que corresponden a áreas rectangulares del cielo observadas repetidamente. Cada observación incluye imágenes de alta resolución en distintos filtros lumínicos, junto con catálogos fotométricos que contienen información detallada sobre las fuentes de luz detectadas, como posición, magnitud y color. Estos catálogos son fundamentales para tareas como la construcción de mapas tridimensionales del entorno observado. En particular, la identificación de estrellas variables periódicas resulta esencial, ya que estas funcionan como indicadores precisos de distancia.
+
+Frente a volúmenes de datos tan extensos como los del \gls{vvv}, las técnicas de \gls{ml} se han consolidado como herramientas indispensables para automatizar la detección, clasificación y análisis de objetos de interés \citep{Bai_2018, Cabral_2020, Ye_2019}. Una etapa crítica en estos flujos de trabajo es la extracción de características a partir de \acrfullpl{lc}, entendidas como series temporales que registran la evolución del brillo de una fuente en función del tiempo. Este proceso permite transformar los datos crudos en representaciones más significativas y adecuadas para alimentar modelos de \gls{ml}, pero representa una tarea intensiva en recursos computacionales, especialmente cuando trabajamos con millones de curvas provenientes de relevamientos extensos.
+
+Herramientas como \acrfull{feets} han demostrado ser útiles al automatizar el cálculo de decenas de características diseñadas específicamente para el análisis de series temporales astronómicas \citep{cabral2018feets}. La biblioteca, desarrollada en Python, proporciona un conjunto modular de extractores de características capaces de obtener métricas estadísticas, propiedades de variabilidad y medidas periódicas a partir de un conjunto de vectores representativos de una \gls{lc}.
+
+La versión original de \gls{feets} realiza todos los cálculos de forma secuencial, evaluando uno por uno cada extractor sobre la curva de entrada. Este enfoque impone un cuello de botella significativo cuando necesitamos procesar grandes volúmenes de datos: en un escenario realista como el del \gls{vvv}, procesar el conjunto completo de \emph{tiles} podría demorar entre ocho meses y dos años y medio, considerando que cada \emph{tile} contiene en promedio más de 100 mil fuentes.
+
+En este trabajo presentamos una refactorización  \citep{fowler1999refactoring} completa de \gls{feets} para adaptarla a los desafíos actuales del análisis astronómico, enfocándonos en su paralelización, la modernización de su entorno tecnológico y el rediseño de su arquitectura interna. La nueva versión implementa un modelo de extracción paralelizado, con estrategias de \emph{multiprocessing} \citep{baer1976multiprocessing}, que mejora significativamente la escalabilidad y los tiempos de cómputo, y adopta tecnologías actuales para optimizar el rendimiento. Además, rediseñamos la interfaz de la aplicación y simplificamos el \emph{framework} para la creación de extractores, incorporando nuevas funcionalidades y principios de diseño de \emph{software} orientados a mejorar la mantenibilidad y extensibilidad del sistema.
+
+El resultado es una nueva versión de \gls{feets} moderna, robusta y escalable, capaz de afrontar los retos computacionales de la astronomía observacional sin comprometer la calidad del software.
+
+\section{Organización del trabajo}
+
+Los capítulos de este trabajo se organizan de la siguiente manera:
+
+En el \autoref{chapter:antecedentes} se presentan los fundamentos astronómicos, computacionales y de diseño de software que sirven de base para este trabajo. Se describe el papel de las \gls{lc} y las técnicas de \gls{ml} aplicadas al análisis astronómico. También se abordan conceptos clave sobre calidad de software y de cómputo distribuido. 
+
+El \autoref{chapter:feets} describe el estado de \gls{feets}, detallando las funcionalidades, la arquitectura y las limitaciones presentes en el código original. 
+
+Los Capítulos~\ref{chapter:parallel} y~\ref{chapter:refactoring} documentan el desarrollo de la nueva versión de \gls{feets}. Abordan la implementación del nuevo modelo de extracción paralelizado y el proceso de modernización y refactorización general de la herramienta, respectivamente.
+
+En el \autoref{chapter:resultados} se presentan los resultados obtenidos en la nueva versión, tanto en términos de rendimiento como de calidad del código.
+
+Finalmente, las conclusiones generales del trabajo son presentadas en el \autoref{chapter:conclusiones}, donde también se discuten posibles líneas futuras de desarrollo.
+
+

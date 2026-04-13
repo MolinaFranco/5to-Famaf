@@ -1,0 +1,102 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f5e9', 'primaryTextColor': '#1b5e20', 'primaryBorderColor': '#4caf50', 'lineColor': '#4caf50'}}}%%
+
+classDiagram
+    direction TB
+
+    %% ============================================
+    %% MÓDULO: _echeveste_training.py
+    %% Funciones JAX para entrenamiento
+    %% ============================================
+
+    class NonlinearMoments {
+        <<module functions>>
+        +compute_nonlinear_moments(mu, sigma, k)$ tuple~nu, gamma~
+        %%  E[r] y ∂E[r]/∂μ para activación supralineal
+        %%  Ref: Eqs. S15-S17, objective.ml:254-268
+    }
+
+    class ADFEvolution {
+        <<module functions>>
+        +compute_jacobian_matrix(w, gamma, inv_taus)$ ndarray
+        %%  J = diag(1/τ)·(W·diag(γ) - I)
+        %%  Ref: Eq. 18, objective.ml:306-309
+
+        +dmu_dt(w, mu, nu, h, inv_taus)$ ndarray
+        %%  dμ/dt = (1/τ)·(-μ + W·ν + h)
+        %%  Ref: Eq. 17, objective.ml:313-316
+
+        +new_sigma_star(j_mat, sigma_eta, sigma_star, dt, tau_eta, inv_taus)$ ndarray
+        %%  dΣ*/dt para correlación temporal del ruido
+        %%  Ref: Eq. 19, objective.ml:318-322
+
+        +new_sigma(j_mat, sigma_star, sigma, dt, inv_taus)$ ndarray
+        %%  dΣ/dt = J·Σ + Σ·J^T + (1/τ)·(Σ* + Σ*^T)
+        %%  Ref: Eq. 18, objective.ml:324-330
+
+        +evolve_moments_single_step(w, mu, sigma, sigma_star, h, sigma_eta, inv_taus, dt, tau_eta, k)$ tuple
+        %%  Un paso de integración ADF
+
+        +evolve_moments(w, h, sigma_eta, inv_taus, dt, n_steps, tau_eta, k, mu_init, sigma_init, sigma_star_init)$ tuple
+        %%  Evolución completa de momentos
+    }
+
+    class CostFunctions {
+        <<module functions>>
+        +compute_cost_components(mu_ssn, sigma_ssn, mu_target, sigma_target, lambda_mean, lambda_var, lambda_cov)$ tuple
+        %%  L = λ_μ·||μ_SSN - μ_GSM||² + λ_σ·||var||² + λ_Σ·||Σ||²_F
+        %%  Ref: Eq. 25, objective.ml:377-408
+
+        +create_temporal_weighting(n_time_bins, min_time_bins, zero_up_to)$ ndarray
+        %%  Pesos temporales para integración del costo
+
+        +compute_slowness_cost(w, mu, sigma, inv_taus, dt, t_max_slow, k, lambda_slow_mu, lambda_slow_sigma)$ float
+        %%  Término de regularización slowness
+
+        +update_temporal_weighting(temporal_weighting, n_time_bins, min_time_bins, anneal_min_time)$ ndarray
+        %%  Actualiza pesos con annealing
+    }
+
+    class ObjectiveFunctions {
+        <<module functions>>
+        +apply_input_transformation(h_vec_raw, alpha_h, beta_h, gamma_h)$ ndarray
+        %%  h = α_h · max(h_vec + β_h, 0)^γ_h
+        %%  Ref: objective.ml:410-413
+
+        +create_objective_function(...)$ callable
+        %%  Stage 2: ADF determinístico
+        %%  Retorna función objetivo para L-BFGS-B
+
+        +create_objective_function_with_samples(...)$ callable
+        %%  Stage 1: Muestreo estocástico
+        %%  Retorna función objetivo para ADAM
+    }
+
+    class StochasticSimulation {
+        <<module functions>>
+        +simulate_ssn_with_noise(w, h_vec, sigma_eta, inv_taus, dt, n_steps, tau_eta, k, key, mu_init)$ tuple
+        %%  Simulación con ruido correlacionado η
+
+        +compute_costs_with_samples(w, h_vec, sigma_eta, inv_taus, dt, n_steps, mu_target, sigma_target, lambdas, tau_eta, k, temporal_weighting, key)$ tuple
+        %%  Cálculo de costos usando muestras
+    }
+
+    class SpatialKernel {
+        <<module functions>>
+        +_spatial_kernel_jax(angular_diff, width)$ ndarray
+        %%  exp[(cos(2·Δθ) - 1) / w²]
+        %%  Kernel espacial para W y Σ_η
+        %%  Ref: Eq. 10-11, objective.ml:285-287
+    }
+
+    %% ============================================
+    %% RELACIONES DE DEPENDENCIA
+    %% ============================================
+    ObjectiveFunctions ..> ADFEvolution : usa evolve_moments
+    ObjectiveFunctions ..> CostFunctions : usa compute_cost_components
+    ObjectiveFunctions ..> StochasticSimulation : usa simulate_ssn_with_noise
+    ADFEvolution ..> NonlinearMoments : usa compute_nonlinear_moments
+    StochasticSimulation ..> NonlinearMoments : usa para activación
+
+    note for NonlinearMoments "Momentos gaussianos truncados\nPermite ADF sin sampling"
+    note for ADFEvolution "Assumed Density Filtering\nEqs. 17-20 del paper"
+    note for ObjectiveFunctions "Funciones objetivo JAX\nCon autodiff para gradientes"

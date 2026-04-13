@@ -1,0 +1,308 @@
+\documentclass[spanish,a4paper,11pt]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{url}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage[authoryear,round,longnamesfirst]{natbib}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{caption}
+\usepackage{float}
+
+\geometry{
+    a4paper,
+    left=2.5cm,
+    right=2.5cm,
+    top=2.5cm,
+    bottom=2.5cm
+}
+
+\setlength{\headheight}{14pt}
+\pagestyle{fancy}
+\lhead{Resumen extendido --- TFC}
+\rhead{Franco Molina}
+\cfoot{\thepage}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\jbc}[1]{}
+\newcommand{\rev}[1]{}
+\newcommand{\completar}[1]{}
+
+\title{\textbf{Implementación de un modelo neuronal de inferencia probabilística con dinámicas corticales realistas en el framework Scikit-NeuroMSI}\\[0.5cm]
+\large Resumen extendido --- Trabajo Final de Carrera\\
+Licenciatura en Ciencias de la Computación}
+
+\author{Franco Molina\\[0.3cm]
+\small Directores: Dr.\ Renato Paredes Venero, Dr.\ Juan Bautista Cabral\\
+\small Facultad de Matemática, Astronomía, Física y Computación\\
+\small Universidad Nacional de Córdoba}
+
+\date{Abril 2026}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+% =============================================================================
+% RESUMEN
+% =============================================================================
+
+\begin{abstract}
+La integración multisensorial, el proceso mediante el cual el cerebro combina información de distintas modalidades sensoriales, constituye un área fundamental de la neurociencia computacional. Los modelos existentes presentan una brecha significativa: aquellos que capturan la arquitectura funcional de la integración multisensorial carecen de dinámicas corticales realistas, mientras que los modelos con dinámicas biológicamente plausibles están limitados al procesamiento unimodal. Este trabajo aborda dicha brecha mediante la implementación del modelo de \citet{echeveste2020cortical} dentro del framework Scikit-NeuroMSI \citep{paredes2025scikit}, una plataforma de código abierto en Python para la modelización neurocomputacional de la integración multisensorial. Dicho modelo demuestra que redes neuronales con restricciones biológicas pueden realizar inferencia probabilística mediante muestreo estocástico, exhibiendo propiedades emergentes como oscilaciones gamma y variabilidad modulada por el estímulo. La reimplementación, que requirió traducir el código original de OCaml a Python/JAX, fue validada alcanzando equivalencia numérica exacta con errores del orden de $10^{-15}$. Como contribuciones adicionales, se desarrollaron módulos para la gestión de parámetros pre-entrenados y para modelos generativos. Los resultados posicionan a esta implementación como base técnica para futuras investigaciones que combinen dinámicas corticales realistas con integración multisensorial.
+\end{abstract}
+
+\vspace{0.5cm}
+\noindent\textbf{Palabras clave:} neurociencia computacional, integración multisensorial, inferencia probabilística, muestreo neuronal, redes supralineales estabilizadas, oscilaciones gamma, Scikit-NeuroMSI.
+
+% =============================================================================
+% 1. INTRODUCCIÓN
+% =============================================================================
+
+\section{Introducción}
+\label{sec:intro}
+
+La integración multisensorial es un proceso neuronal fundamental mediante el cual el cerebro combina información proveniente de distintas modalidades sensoriales para generar representaciones más robustas y confiables del entorno. Cuando vemos a alguien hablar, integramos automáticamente las señales visuales de los movimientos labiales con las señales auditivas de la voz, percibiendo un evento unificado más claro que cualquiera de sus componentes por separado. Este fenómeno, documentado extensamente desde los estudios pioneros en el colículo superior \citep{stein2012new}, constituye una de las capacidades más notables del sistema nervioso.
+
+Diversos enfoques computacionales han buscado capturar los mecanismos subyacentes a esta integración. Entre ellos, dos trabajos resultan particularmente relevantes por representar enfoques complementarios. El modelo de \citet{cuppini2017biologically} aborda la integración audiovisual mediante una arquitectura de tres capas jerárquicas que reproduce fenómenos experimentales como el efecto ventrílocuo; sin embargo, al utilizar modelos de tasa deterministas, no captura la variabilidad ni las dinámicas oscilatorias de la actividad cortical real. Por otro lado, el modelo de \citet{echeveste2020cortical} demuestra que redes neuronales con restricciones biológicas pueden implementar inferencia probabilística mediante muestreo estocástico, exhibiendo propiedades emergentes como oscilaciones gamma y transitorios inhibitorios; no obstante, está restringido al procesamiento unimodal.
+
+Esta situación revela una brecha significativa: los modelos que capturan la arquitectura funcional de la integración multisensorial carecen de dinámicas corticales realistas, mientras que aquellos con dinámicas biológicamente plausibles están limitados al procesamiento unimodal. La visión a largo plazo que motiva este trabajo es el desarrollo de modelos que combinen ambos enfoques. El presente trabajo representa el primer paso mediante la implementación del modelo de Echeveste dentro del framework Scikit-NeuroMSI \citep{paredes2025scikit}, incluyendo la arquitectura de red, el modelo generativo, el procedimiento de entrenamiento, y herramientas de análisis para dinámicas temporales.
+
+% =============================================================================
+% 2. MARCO TEÓRICO
+% =============================================================================
+
+\section{Marco teórico}
+\label{sec:marco}
+
+\subsection{Fundamentos biológicos del procesamiento visual}
+
+Los modelos computacionales de este trabajo se fundamentan en la organización jerárquica del sistema visual. La corteza visual primaria (V1), primera estación de procesamiento cortical, se organiza en hipercolumnas: unidades funcionales de aproximadamente un milímetro cuadrado que contienen neuronas sensibles a todas las orientaciones posibles en una ubicación del campo visual \citep{hubel1959receptive}. Las neuronas de V1 responden selectivamente a bordes y barras con orientaciones específicas, una propiedad descubierta por Hubel y Wiesel que estableció los principios de la selectividad neuronal \citep{dayan2005theoretical}. Los campos receptivos de las células simples pueden aproximarse mediante funciones de Gabor, producto de una gaussiana (extensión espacial) y una sinusoidal (estructura de bandas):
+\begin{equation}
+D_s(x, y) = \frac{1}{2\pi\sigma_x\sigma_y} \exp\left(-\frac{x^2}{2\sigma_x^2} - \frac{y^2}{2\sigma_y^2}\right) \cos(kx - \phi)
+\label{eq:gabor}
+\end{equation}
+donde $\sigma_x$, $\sigma_y$ controlan la extensión espacial, $k$ la frecuencia espacial, y $\phi$ la fase. Estos filtros son centrales en el modelo generativo utilizado por \citet{echeveste2020cortical}.
+
+Los circuitos corticales se caracterizan por conexiones recurrentes abundantes entre poblaciones excitatorias (E) e inhibitorias (I), organizadas según el principio de Dale \citep{dale1935pharmacology}. La interacción E-I genera dinámicas complejas, incluyendo oscilaciones gamma (30-80~Hz) asociadas al procesamiento sensorial y la atención \citep{echeveste2020cortical}. En particular, la red supralineal estabilizada (SSN) constituye una arquitectura que captura estas propiedades mediante funciones de transferencia supralineales y conectividad recurrente estabilizadora.
+
+\subsection{Percepción como inferencia probabilística}
+
+La percepción puede entenderse como inferencia bayesiana sobre las causas latentes de las observaciones sensoriales. Dado un estímulo $\mathbf{x}$, el cerebro busca inferir las variables latentes $\mathbf{y}$ mediante:
+\begin{equation}
+P(\mathbf{y}|\mathbf{x}) = \frac{P(\mathbf{x}|\mathbf{y})P(\mathbf{y})}{P(\mathbf{x})}
+\label{eq:bayes}
+\end{equation}
+
+La hipótesis del \textbf{muestreo neuronal} propone que el cerebro representa esta distribución posterior mediante muestras temporales: la actividad neuronal fluctuante proporciona muestras de $P(\mathbf{y}|\mathbf{x})$, de modo que $\langle \mathbf{y}(t) \rangle_t \approx \mathbb{E}_{P(\mathbf{y}|\mathbf{x})}[\mathbf{y}]$ \citep{echeveste2020cortical}. Esta perspectiva transforma la variabilidad neuronal de ``ruido'' a eliminar en una característica funcional que codifica incertidumbre perceptual.
+
+\subsection{Integración multisensorial e inferencia causal}
+
+Cuando múltiples modalidades proporcionan información sobre una propiedad, la combinación óptima sigue un integrador de máxima verosimilitud \citep{alais2004ventriloquist}: $\hat{S}_{AV} = w_A \hat{S}_A + w_V \hat{S}_V$, donde los pesos son proporcionales a la confiabilidad (inversa de la varianza) de cada modalidad. Sin embargo, este modelo asume causa común. El modelo de inferencia causal bayesiana \citep{kording2007causal} extiende este marco para inferir simultáneamente la estructura causal subyacente: si las señales provienen de una causa común o de fuentes separadas.
+
+El efecto ventrílocuo, donde un estímulo auditivo se percibe como proveniente de la ubicación de un estímulo visual simultáneo, constituye el paradigma experimental estándar para estudiar estos fenómenos y motivó inicialmente el presente trabajo.
+
+% =============================================================================
+% 3. MODELOS ESTUDIADOS
+% =============================================================================
+
+\section{Modelos estudiados}
+\label{sec:modelos}
+
+\subsection{Modelo de Cuppini para integración audiovisual}
+
+El modelo de \citet{cuppini2017biologically} se estructura en tres capas jerárquicas: una capa auditiva, una visual, y una capa multisensorial de inferencia causal. Las capas unisensoriales se interconectan mediante sinapsis cross-modales excitatorias que producen el efecto ventrílocuo, mientras que la capa multisensorial computa la inferencia causal. El modelo reproduce exitosamente varios fenómenos experimentales, pero al utilizar modelos de tasa deterministas, no captura la variabilidad trial-a-trial, las oscilaciones gamma, ni los transitorios inhibitorios característicos de la actividad cortical real.
+
+\subsection{Modelo de Echeveste para inferencia probabilística}
+
+El modelo de \citet{echeveste2020cortical}, objeto central de implementación, aborda el problema desde la dirección opuesta: partiendo de restricciones biológicas, demuestra que redes neuronales recurrentes pueden ser optimizadas para implementar inferencia probabilística basada en muestreo.
+
+\subsubsection{Arquitectura de red}
+
+La red modela una hipercolumna de V1 con neuronas organizadas en un anillo, donde la posición de cada una corresponde a su orientación preferida ($-90°$ a $90°$). Contiene $N_E = 50$ neuronas excitatorias y $N_I = 50$ inhibitorias organizadas en pares E-I. La dinámica de cada neurona sigue:
+\begin{equation}
+\tau_i \frac{du_i}{dt} = -u_i(t) + h_i(t) + \sum_j W_{ij} r_j(t) + \eta_i(t)
+\label{eq:ssn}
+\end{equation}
+donde $u_i$ es el potencial de membrana, $h_i$ la entrada feedforward, $W_{ij}$ los pesos sinápticos, $r_j = k[u_j]_+^n$ la tasa de disparo supralineal, y $\eta_i(t)$ ruido de proceso correlacionado temporalmente.
+
+La conectividad se parametriza de forma circulante: cada bloque de la matriz $\mathbf{W}$ se define como $W_{XY}(\theta_i, \theta_j) = a_{XY} \exp\left(\frac{\cos(2(\theta_i - \theta_j)) - 1}{d_{XY}^2}\right)$, reduciendo el número de parámetros de 10,000 a solo 8 para la conectividad.
+
+\subsubsection{Modelo generativo (GSM)}
+
+El problema computacional se define mediante el modelo de mezcla de escala gaussiana (GSM): un parche de imagen $\mathbf{x}$ se genera como $\mathbf{x} = z \cdot \mathbf{A}\mathbf{y} + \boldsymbol{\epsilon}$, donde $\mathbf{y}$ son variables latentes, $\mathbf{A}$ es la matriz de filtros de Gabor, $z$ es el contraste global, y $\boldsymbol{\epsilon}$ es ruido sensorial. La distribución posterior tiene forma gaussiana con media y covarianza:
+\begin{equation}
+\boldsymbol{\mu}_{\text{GSM}} = \frac{z}{\sigma_x^2} \boldsymbol{\Sigma}_{\text{GSM}} \mathbf{A}^\top \mathbf{x}, \quad
+\boldsymbol{\Sigma}_{\text{GSM}} = \left( \mathbf{C}^{-1} + \frac{z^2}{\sigma_x^2} \mathbf{A}^\top \mathbf{A} \right)^{-1}
+\label{eq:gsm_posterior}
+\end{equation}
+
+\subsubsection{Entrenamiento para muestreo}
+
+El entrenamiento minimiza una función de costo que penaliza diferencias entre los momentos de la distribución de respuestas de la red y los momentos objetivo del GSM:
+\begin{equation}
+\mathcal{F} = \sum_\alpha \left( \epsilon_{\mu} \phi_{\text{mean}}^{(\alpha)} + \epsilon_{\sigma} \phi_{\text{var}}^{(\alpha)} + \epsilon_{\Sigma} \phi_{\text{cov}}^{(\alpha)} + \epsilon_{\text{slow}} \phi_{\text{slow}}^{(\alpha)} \right)
+\label{eq:cost}
+\end{equation}
+La optimización procede en dos fases: Phase~1 utiliza gradiente estocástico con ADAM (250 iteraciones, 50 trials por estímulo), y Phase~2 emplea L-BFGS-B con el método de filtrado de densidad asumido (ADF) para gradientes determinísticos. En total, la red tiene 15 parámetros libres: 8 de conectividad, 4 de covarianza de ruido, y 3 de transformación de entrada.
+
+\subsubsection{Propiedades emergentes}
+
+La red optimizada exhibe propiedades que emergen sin ser impuestas: \textbf{variabilidad modulada por el estímulo} (la varianza decrece con el contraste), \textbf{transitorios inhibitorios} al inicio de estímulos, y \textbf{oscilaciones gamma} cuya frecuencia pico aumenta con el contraste. Estas propiedades cumplen roles funcionales: las oscilaciones aceleran la exploración del espacio de estados y los transitorios reducen el tiempo de convergencia.
+
+% =============================================================================
+% 4. SCIKIT-NEUROMSI
+% =============================================================================
+
+\section{Scikit-NeuroMSI}
+\label{sec:framework}
+
+Scikit-NeuroMSI \citep{paredes2025scikit} es un framework de código abierto en Python diseñado para la modelización neurocomputacional de la integración multisensorial. Proporciona infraestructura común para implementar, comparar y validar modelos a diferentes niveles de descripción.
+
+La arquitectura se fundamenta en el Principio de Inversión de Dependencias y el Patrón Estrategia. La clase base abstracta \texttt{SKNMSIMethodABC} define la interfaz estándar para todos los modelos. \texttt{NDResult} almacena resultados multidimensionales con cuatro dimensiones predefinidas (modalidades, tiempos, posiciones, coordenadas), y \texttt{NDResultCollection} permite agregar múltiples resultados para análisis de barridos de parámetros.
+
+El framework incluye implementaciones de referencia del integrador bimodal óptimo (MLE), el modelo de inferencia causal bayesiana \citep{kording2007causal}, y el modelo de red de Cuppini. El presente trabajo contribuye la primera implementación de un modelo con dinámicas corticales realistas basadas en muestreo estocástico.
+
+% =============================================================================
+% 5. IMPLEMENTACIÓN
+% =============================================================================
+
+\section{Implementación}
+\label{sec:impl}
+
+\subsection{Arquitectura general}
+
+La implementación se estructura en cinco módulos dentro de \texttt{skneuromsi/neural/echeveste2020}: \texttt{\_model.py} (clase principal \texttt{Echeveste2020} y el integrador \texttt{SSNIntegrator}), \texttt{\_training.py} (funciones de entrenamiento con JAX), \texttt{\_gsm.py} (modelo generativo GSM), \texttt{\_visualization.py} (herramientas de análisis), y \texttt{\_data\_loader.py} (acceso a parámetros pre-entrenados). La clase \texttt{Echeveste2020} hereda de \texttt{SKNMSIMethodABC}, garantizando compatibilidad con las herramientas existentes del framework.
+
+El modelo se inicializa con \texttt{pretrained=True} para cargar parámetros pre-optimizados, o mediante el método \texttt{train()} para ejecutar la optimización completa. Una vez configurado, \texttt{run()} ejecuta la simulación retornando un \texttt{NDResult}.
+
+\subsection{Reimplementación en JAX}
+
+Uno de los desafíos inesperados fue descubrir que el código de entrenamiento original estaba implementado en OCaml, un lenguaje completamente atípico para la neurociencia computacional moderna. En comunicación personal con el Dr.\ Echeveste, comprendimos las razones históricas: al momento del desarrollo original (2016), las herramientas de diferenciación automática actuales no existían o no habían alcanzado la madurez necesaria.
+
+La reimplementación en JAX fue la elección natural por varias razones. Su paradigma de programación funcional guarda afinidad con OCaml, facilitando la traducción algorítmica. JAX ya se encontraba integrado en Scikit-NeuroMSI como dependencia, manteniendo coherencia tecnológica. Desde el punto de vista computacional, JAX ofrece compilación JIT mediante XLA, diferenciación automática composicional mediante \texttt{jax.grad} (esencial para el método ADF), y soporte transparente para GPU.
+
+\subsection{Modelo generativo GSM}
+
+La clase \texttt{GSM} se implementó como un módulo independiente dentro del nuevo paquete \texttt{generative}, separando la lógica del problema computacional (GSM) de su implementación neuronal (SSN). Sus responsabilidades incluyen la generación de filtros de Gabor (matriz $\mathbf{A}$), la producción de parches de imagen con diferentes contrastes, el cálculo de momentos objetivo, y la transformación feedforward:
+\begin{equation}
+h_i(t) = \left[ \alpha_h \left( \beta_h + \sum_j W_{ij}^{ff} x_j(t) \right) \right]_+^{\gamma_h}
+\label{eq:ff}
+\end{equation}
+
+\subsection{Integrador SSN y conectividad}
+
+La clase \texttt{SSNIntegrator} encapsula las ecuaciones diferenciales del modelo como un \textit{dataclass} de Python. La integración numérica utiliza el método de Euler explícito con paso $dt = 0.2$~ms, consistente con el código original. La implementación soporta dos modos de simulación: fase única (estímulo constante, para validación de momentos) y tres fases (pre-estímulo, estímulo, post-estímulo, para estudiar transitorios y oscilaciones).
+
+La matriz de conectividad $\mathbf{W}$ se construye de manera vectorizada a partir de los 8 parámetros circulantes, respetando el principio de Dale. El ruido evoluciona según un proceso de Ornstein-Uhlenbeck que mantiene la estructura de correlaciones espaciales definida por $\boldsymbol{\Sigma}_\eta$.
+
+\subsection{Proceso de entrenamiento}
+
+La implementación sigue fielmente el procedimiento de dos etapas. Phase~1 utiliza ADAM con tasa de aprendizaje $\eta = 0.002$ y annealing del tiempo inicial $T_{\min}$ para incentivar dinámicas de muestreo rápidas. Phase~2 emplea L-BFGS-B con ADF, optimizando los 15 parámetros totales incluyendo los de transformación de entrada y covarianza de ruido. La función de costo implementa los cuatro términos: error de media ($\epsilon_\mu = 4.0 \times 10^{-5}$), varianza ($\epsilon_\sigma = 8.0 \times 10^{-5}$), covarianza ($\epsilon_\Sigma = 8.0 \times 10^{-7}$), y penalización de lentitud ($\epsilon_{\text{slow}} = 4.0 \times 10^{-10}$).
+
+\subsection{Módulos de soporte}
+
+Se contribuyeron dos módulos nuevos al framework: \texttt{data}, que proporciona infraestructura para gestionar parámetros pre-entrenados mediante las clases \texttt{EchevesteDataLoader} y \texttt{GSMDataLoader}; y \texttt{generative}, que introduce por primera vez modelos generativos como el GSM al framework, diseñado con extensibilidad para futuros modelos generativos.
+
+% =============================================================================
+% 6. RESULTADOS
+% =============================================================================
+
+\section{Resultados}
+\label{sec:resultados}
+
+La validación se estructuró en cuatro niveles complementarios: pruebas automatizadas, validación función por función, verificación del entrenamiento, y reproducción de figuras del artículo original.
+
+\subsection{Validación función por función}
+
+Se generaron $N = 10{,}000$ muestras aleatorias para cada una de las 25 funciones del modelo, ejecutando tanto la implementación original como la nuestra con inputs idénticos. La Tabla~\ref{tab:validation} resume los resultados por categoría.
+
+\begin{table}[H]
+\centering
+\caption{Validación función por función contra código original ($N = 10{,}000$ muestras).}
+\label{tab:validation}
+\begin{tabular}{clcc}
+\toprule
+\textbf{\#} & \textbf{Categoría} & \textbf{Error máximo} & \textbf{Estado} \\
+\midrule
+1 & Distribución Normal & $0.00$ & \checkmark \\
+2 & Activación Neuronal & $0.00$ & \checkmark \\
+3 & Momentos $\nu$, $\gamma$ & $7.11 \times 10^{-15}$ & \checkmark \\
+4 & Evolución Temporal & $0.00$ & \checkmark \\
+5 & Conectividad Paramétrica & $0.00$ & \checkmark \\
+6 & Ruido O-U & $1.11 \times 10^{-16}$ & \checkmark \\
+7 & GSM Posterior & $0.00$ & \checkmark \\
+8 & Funciones Auxiliares & $0.00$ & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Todos los errores están en el orden de la precisión de punto flotante IEEE~754 de doble precisión ($\epsilon \approx 2.22 \times 10^{-16}$), confirmando equivalencia numérica exacta.
+
+Se verificó además la consistencia del pipeline de generación de estímulos del GSM, comparando el vector de entrada $\mathbf{h}$ a través de cuatro variantes del pipeline. Las diferencias resultaron del orden de $10^{-13}$ a $10^{-15}$, garantizando que cualquier discrepancia en la dinámica no se deba a la generación del estímulo.
+
+\subsection{Validación del entrenamiento}
+
+Se ejecutaron 100 corridas independientes desde condiciones iniciales aleatorias. Las amplitudes de conectividad convergen consistentemente hacia los valores de referencia de la Tabla Suplementaria S1 de \citet{echeveste2020cortical}, con coeficientes de variación menores a 0.13 y más del 89\% de las corridas dentro de la tolerancia $\pm 10\%$ para todos los parámetros.
+
+\begin{table}[H]
+\centering
+\caption{Convergencia de parámetros de conectividad (100 corridas independientes).}
+\label{tab:connectivity}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Parámetro} & \textbf{Referencia} & \textbf{Obtenido} & \textbf{CV} & \textbf{Tolerancia} \\
+\midrule
+$a_{EE}$ & 0.331 & $0.342 \pm 0.021$ & 0.061 & 0.982 \\
+$a_{EI}$ & 0.081 & $0.084 \pm 0.011$ & 0.131 & 0.974 \\
+$a_{IE}$ & 0.363 & $0.371 \pm 0.022$ & 0.059 & 0.963 \\
+$a_{II}$ & 0.074 & $0.082 \pm 0.021$ & 0.256 & 0.891 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Los parámetros de transformación de entrada convergen con errores relativos menores al 5\%: $\alpha_h \approx 1.94$ (ref.\ 1.96), $\beta_h \approx 0.10$ (ref.\ 0.10), $\gamma_h \approx 2.01$ (ref.\ 2.03). La proximidad del exponente $\gamma_h \approx 2$ al exponente supralineal $n = 2$ sugiere consistencia en el procesamiento no lineal a través del modelo.
+
+\subsection{Reproducción de resultados experimentales}
+
+Se replicaron los experimentos de la Figura~2 de \citet{echeveste2020cortical}. Las simulaciones utilizaron los parámetros pre-entrenados para los cinco niveles de contraste ($z \in \{0, 0.125, 0.25, 0.5, 1.0\}$), con simulaciones de 1000~ms y paso de integración de 0.2~ms.
+
+\textbf{Actividad poblacional.} En ausencia de estímulo, la actividad fluctúa con distribución espacial uniforme. Con contraste máximo, la actividad se centra en las neuronas con orientación preferida cercana a la del estímulo, con magnitud consistente con registros de V1.
+
+\textbf{Correspondencia de momentos.} Las curvas de media poblacional reproducen fielmente tanto la forma como la escala de las predicciones del GSM. La variabilidad se reduce con el contraste (fenómeno de \textit{quenching}), emergiendo naturalmente de las propiedades del modelo generativo. La correlación de Pearson elemento por elemento entre las matrices de correlación del observador ideal y la red supera 0.95 para todos los niveles de contraste.
+
+\textbf{Oscilaciones gamma.} El análisis espectral del potencial de campo local (LFP), aproximado como el promedio de potenciales de membrana excitatorios, confirma la presencia de oscilaciones gamma con frecuencia pico creciente con el contraste: de aproximadamente 32~Hz para contraste bajo a 56~Hz para contraste máximo, consistente con observaciones experimentales en V1 \citep{echeveste2020cortical}.
+
+\textbf{Variabilidad modulada por estímulo.} El factor de Fano decrece desde $1.0$--$1.2$ (contraste cero) hacia $0.6$--$0.8$ (contraste máximo), con reducción particularmente pronunciada para neuronas cuya orientación preferida coincide con la del estímulo.
+
+% =============================================================================
+% 7. CONCLUSIONES
+% =============================================================================
+
+\section{Conclusiones y trabajo futuro}
+\label{sec:conclu}
+
+Este trabajo llevó a cabo la implementación completa del modelo de \citet{echeveste2020cortical} dentro del framework Scikit-NeuroMSI, estableciendo las bases técnicas para futuras investigaciones que combinen dinámicas corticales realistas con integración multisensorial.
+
+La reimplementación del código original de OCaml a Python/JAX resultó en una implementación moderna, compatible con el ecosistema actual, con soporte transparente para aceleración en GPU y arquitectura modular. La validación demostró equivalencia numérica exacta ($\sim 10^{-15}$) función por función, convergencia robusta del entrenamiento en 100 corridas independientes, y reproducción correcta de las propiedades de inferencia probabilística y dinámicas temporales características.
+
+Como contribuciones adicionales, se desarrollaron los paquetes \texttt{data} y \texttt{generative}, ampliando las capacidades del framework. La implementación se centró exclusivamente en el modelo unimodal; la fusión con el modelo de Cuppini quedó fuera del alcance debido a que el trabajo resultó considerablemente mayor al anticipado, incluyendo la reimplementación desde OCaml y la resolución de incompatibilidades no previstas.
+
+La dirección más prometedora para trabajo futuro es la integración con el modelo de Cuppini, que permitiría estudiar cómo fenómenos de integración multisensorial emergen de circuitos que implementan inferencia probabilística mediante muestreo estocástico. A diferencia de los modelos deterministas existentes, un modelo así generaría señales de LFP con oscilaciones emergentes en bandas fisiológicamente relevantes, abriendo la posibilidad de modelar directamente las dinámicas oscilatorias cerebrales asociadas a la integración multisensorial y contrastarlas con registros electrofisiológicos reales \citep{ursino2017multisensory}. Otras extensiones incluyen la implementación de nuevos modelos generativos siguiendo la interfaz del GSM, y la validación experimental contra registros de V1 como los analizados por \citet{banyai2019stimulus} y \citet{haefner2016perceptual}.
+
+Más allá de su contribución técnica, este trabajo se enmarca en una perspectiva más amplia sobre el rol de los modelos biológicamente plausibles. El modelo de Echeveste demuestra que propiedades biológicas como las oscilaciones gamma y la variabilidad neuronal no son meros epifenómenos sino que cumplen roles computacionales precisos en la inferencia probabilística. La implementación validada que aquí presentamos constituye una condición necesaria para cualquier desarrollo futuro hacia el procesamiento multisensorial con dinámicas corticales realistas.
+
+% =============================================================================
+% BIBLIOGRAFÍA
+% =============================================================================
+
+\bibliographystyle{apalike}
+\bibliography{tesis}
+
+\end{document}

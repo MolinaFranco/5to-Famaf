@@ -1,0 +1,19 @@
+{
+  "contrast": 0.25,
+  "noise_level": 0.05,
+  "n_neurons_e": 50,
+  "n_neurons_i": 50,
+  "simulation_time": 1000.0,
+  "dt": 0.2,
+  "burn_in": 200.0,
+  "use_three_phases": false,
+  "stimulus_type": "narrow_generated",
+  "width_factor": 0.01,
+  "dominant_idx": 25,
+  "amplitude": 15.4641,
+  "h_max": 3.940510600579209,
+  "h_min": 0.027208528288688343,
+  "u_E_mean": 3.34390607590655,
+  "r_E_mean": 4.870287326826125,
+  "timestamp": "2025-11-28T13:35:02.565947"
+}

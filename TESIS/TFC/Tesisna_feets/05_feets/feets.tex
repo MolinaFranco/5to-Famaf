@@ -1,0 +1,338 @@
+\chapter[feATURE eXTRACTOR FOR tIME sERIES]{
+    \acrlong{feets}
+}
+\label{chapter:feets}
+
+\acrfull{feets} \citep{cabral2018feets} es una biblioteca de Python diseñada para la extracción de características en series temporales, haciendo énfasis en el estudio de \acrfullpl{lc}. Entre sus funcionalidades, incluye herramientas para el modelado, clasificación, limpieza de datos, detección de valores atípicos y análisis de catálogos fotométricos.
+
+La herramienta proporciona un \emph{framework} especializado para la creación de extractores de características. Cuenta, también, con un conjunto estandarizado de \emph{features} listos para usar, que abarcan desde medidas estadísticas básicas como la media o la desviación estándar, hasta características complejas y específicas de las \glspl{lc} \citep{gran2015bulge}, como la función de autocorrelación. A pesar de su enfoque en el análisis de \glspl{lc}, \gls{feets} no se limita solamente al campo astronómico, sino que puede aplicarse a otras series temporales.
+
+El proyecto surge como una refactorización integral de \gls{fats} \citep{nun2015fatsfeatureanalysistime}, con el objetivo de corregir deficiencias en su diseño, optimización y compatibilidad con versiones modernas de Python \citep{cabral2018fatsfeetsimprovementsastronomical}. Gracias a su arquitectura modular y mejorada, \gls{feets} facilita el procesamiento de grandes volúmenes de datos astronómicos e integra bibliotecas como \emph{AstroPy}\footnote{\url{https://www.astropy.org/}} para mejorar su interoperabilidad dentro del ecosistema de herramientas de astroinformática.
+
+\section{Uso de la herramienta}
+
+En este trabajo nos centraremos en el uso de \gls{feets} sobre el dominio de las \acrlongplsp{lc} astronómicas. No obstante, es importante destacar que la herramienta no se restringe únicamente al campo astronómico, sino que puede aplicarse sobre cualquier serie temporal que cuente con los vectores de datos necesarios.
+
+En pocas palabras, \gls{feets} recibe como entrada los vectores de datos que componen una serie y devuelve un arreglo con las características computadas. El conjunto de características disponibles depende de los datos proporcionados por el usuario: si solo cuenta con vectores de magnitud y de tiempo, entonces solo se calcularán las características que puedan extraerse a partir de estos valores.
+
+Para calcular el conjunto completo de características a partir de una \gls{lc}, la herramienta necesita de los siguientes vectores de datos:
+\begin{itemize}
+    \item \texttt{magnitude}. Magnitudes observadas.
+    \item \texttt{time}. Tiempos de observación de \texttt{magnitude}.
+    \item \texttt{error}. Errores asociados a \texttt{magnitude}.
+    \item \texttt{magnitude2}. Magnitudes observadas en una banda diferente.
+    \item \texttt{aligned\_magnitude}. Valores de \texttt{magnitude} temporalmente sincronizados con los de \texttt{magnitude2}.
+    \item \texttt{aligned\_magnitude2}. Valores de \texttt{magnitude2} temporalmente sincronizados con los de \texttt{magnitude}.
+    \item \texttt{aligned\_time}. Tiempos de observación compartidos entre \texttt{a\-ligned\_mag\-ni\-tude} y \texttt{aligned\_magnitude2}.
+    \item \texttt{aligned\_error}. Errores asociados a \texttt{aligned\_magnitude}.
+    \item \texttt{aligned\_error2}. Errores asociados a \texttt{aligned\_magnitude2}.
+\end{itemize}
+De estos, los vectores de magnitud y de tiempo son estrictamente necesarios para la ejecución porque son requeridos para el cálculo de todas las características disponibles. Los demás vectores son opcionales, requeridos solamente por algunas características específicas.
+
+El \autoref{code:usage} ilustra el funcionamiento básico de \gls{feets} para la extracción de características de una \gls{lc} simulada. A continuación se describe paso a paso lo que hace el código:
+
+\begin{enumerate}
+    \item En las líneas 1 y 2, se importan las dependencias necesarias: \texttt{feets}, para hacer uso de la herramienta de extracción de características, y \texttt{numpy}, para la generación de datos numéricos simulados.
+
+    \item En las líneas 4 y 5, se generan los vectores que conforman la \gls{lc}: se simulan aleatoriamente 30 valores para la magnitud aparente, y se generan sus 30 tiempos de observación asociados. En la línea 6, ambos vectores se agrupan en una lista que representa la \gls{lc} simulada.
+
+    \item En la línea 8, se crea un espacio de características (\texttt{FeatureSpace}) indicando que se proporcionarán únicamente los vectores de magnitud y tiempo. Esta configuración determina qué subconjunto de características será calculado.
+
+    \item En la línea 9, se llama al método \texttt{extract()} para extraer automáticamente las características de la \gls{lc} simulada. Este método devuelve dos listas: una con los nombres de las características extraídas y otra con sus valores correspondientes.
+
+    \item Finalmente, en la línea 11, se reorganizan las características y sus valores en el diccionario \texttt{fdict}, mejorando su representación para un procesamiento posterior.
+\end{enumerate}
+
+\begin{code}
+\begin{minted}{pycon}
+>>> import feets
+>>> import numpy as np
+
+>>> time = np.arange(30)
+>>> magnitude = np.random.rand(30)
+>>> lc = [time, magnitude]
+
+>>> fs = feets.FeatureSpace(data=["time", "magnitude"])
+>>> features, values = fs.extract(*lc)
+
+>>> dict(zip(features, values))
+{'Amplitude': 0.4400277612857634,
+ 'AndersonDarling': 0.8117749648312879,
+ 'Autocor_length': 1.0,
+ 'Con': 0.0,
+ 'Eta_e': 2.0654257245579264,
+ ...
+ 'PeriodLS': 0.052641132691958616,
+ 'Period_fit': 1.0,
+ 'Psi_CS': 0.1892202321018822,
+ 'Psi_eta': 1.5441584299683062,
+ 'Q31': 0.3968494550357215,
+ 'Rcs': 0.21378454173755806,
+ 'Skew': 0.25929379112189904,
+ 'SlottedA_length': 1.0,
+ 'SmallKurtosis': -0.6405350057567984,
+ 'Std': 0.2597002131031463,
+ 'StructureFunction_index_21': 1.8028982695940259,
+ 'StructureFunction_index_31': 2.4687064391908753,
+ 'StructureFunction_index_32': 1.40457469223505}
+\end{minted}
+\caption{
+    Ejemplo del uso de \gls{feets} para la extracción de características de una \gls{lc} simulada con magnitudes aleatorias.
+}
+\label{code:usage}
+\end{code}
+
+
+\section{Funcionalidades}
+
+Además de todo lo mencionado, \gls{feets} ofrece las siguientes funcionalidades:
+
+\begin{description}
+    \item[Extracción de características]
+     La biblioteca cuenta con varios extractores listos para usar, los cuales permiten calcular más 40 características a partir de una \gls{lc}. Estas características incluyen medidas estadísticas, indicadores de periodicidad y métricas específicas de variabilidad.
+     
+     La lista completa de las características presentes en \gls{feets} se puede visualizar en la \autoref{table:features}.
+
+    \item[Base para la creación de extractores]
+    Además de los extractores preinstalados en la biblioteca, \gls{feets} incorpora un \emph{framework} para crear extractores de características propios.
+    
+    Cada extractor constituye una clase de Python. Esta clase debe extender la metaclase \texttt{feets.Extractor} con atributos que definan los datos de la serie temporal requeridos por el extractor (\texttt{data}) y las características que puede computar (\texttt{features}). También debe implementar el método \texttt{fit()}, que contiene la lógica de extracción de características.
+
+    El \autoref{code:extractor} es un ejemplo de un extractor simple que computa el número de observaciones en una serie temporal. Toma como entrada los tiempos de observación de la muestra y devuelve un diccionario con la característica \texttt{Count}.
+
+    El cálculo de las características de un extractor puede depender de los resultados obtenidos por otro. Estas dependencias deber ser especificadas en el atributo \texttt{dependencies} de la clase. Adicionalmente, un extractor puede contar con parámetros opcionales, personalizables por el usuario. Cada parámetro debe contar con un valor predeterminado el cual es asignado por el extractor en caso de no ser evaluado manualmente por el usuario. Los parámetros disponibles y sus valores predeterminados se deben declarar bajo el atributo \texttt{params}.
+\end{description}
+
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{||p{4cm}|p{7cm}||}
+        \hline
+
+         Datos de entrada
+         &
+         Características
+         \\
+
+        \hline
+        \hline
+
+        \texttt{magnitude}
+        & 
+        \texttt{Amplitude},
+        \texttt{AndersonDarling},
+        \texttt{Autocor\_length},
+        \texttt{Con},
+        \texttt{FluxPercentileRatioMid20},
+        \texttt{FluxPercentileRatioMid35},
+        \texttt{FluxPercentileRatioMid50},
+        \texttt{FluxPercentileRatioMid65},
+        \texttt{FluxPercentileRatioMid80},
+        \texttt{Gskew},
+        \texttt{Mean},
+        \texttt{Meanvariance},
+        \texttt{MedianAbsDev},
+        \texttt{MedianBRP},
+        \texttt{PairSlopeTrend},
+        \texttt{PercentAmplitude},
+        \texttt{PercentDifferenceFluxPercentile},
+        \texttt{Q31},
+        \texttt{Rcs},
+        \texttt{Skew},
+        \texttt{SmallKurtosis},
+        \texttt{Std}.
+        \\
+
+        \hline
+
+        \texttt{magnitude}, 
+        \texttt{time}
+        &
+        \texttt{Eta\_e},
+        \texttt{Freq{i}\_harmonics\_amplitude\_{j}},
+        \texttt{LinearTrend},
+        \texttt{MaxSlope},
+        \texttt{PeriodLS},
+        \texttt{Period\_fit},
+        \texttt{Psi\_CS},
+        \texttt{Psi\_eta},
+        \texttt{SlottedA\_length},
+        \texttt{StructureFunction\_index\_21},
+        \texttt{StructureFunction\_index\_31},
+        \texttt{StructureFunction\_index\_32}.
+        \\
+        
+        \hline
+        
+        \texttt{magnitude}, 
+        \texttt{error}
+        &
+        \texttt{Beyond1Std},
+        \texttt{StetsonK}.
+        \\
+        
+        \hline
+        
+        \texttt{magnitude}, 
+        \texttt{time},
+        \texttt{error}
+        &
+        \texttt{CAR\_mean},
+        \texttt{CAR\_sigma},
+        \texttt{CAR\_tau},
+        \texttt{StetsonK\_A}.
+        \\
+        
+        \hline
+        
+        \texttt{magnitude}, 
+        \texttt{magnitude2}
+        &
+        \texttt{Color}.
+        \\
+        
+        \hline
+        
+        \texttt{aligned\_magnitude}, 
+        \texttt{aligned\_magnitude2}
+        &
+        \texttt{Q31\_color}.
+        \\
+        
+        \hline
+        
+        \texttt{aligned\_magnitude}, 
+        \texttt{aligned\_magnitude2},
+        \texttt{aligned\_time}
+        &
+        \texttt{Eta\_color}.
+        \\
+        
+        \hline
+        
+        \texttt{aligned\_magnitude}, 
+        \texttt{aligned\_magnitude2},
+        \texttt{aligned\_error},
+        \texttt{aligned\_error2},
+        &
+        \texttt{StetsonJ},
+        \texttt{StetsonL},
+        \\
+        
+        \hline
+    \end{tabular}
+    \caption{
+        Características presentes en \gls{feets} según sus datos de entrada.
+    }
+    \label{table:features}
+\end{table}
+
+\begin{code}
+\begin{minted}{python}
+from feets import Extractor
+
+class Count(Extractor):
+    # datos requeridos por el extractor para calcular las características
+    data = ["time"]
+    
+    # características computadas por el extractor
+    features = ["Count"]
+
+    def fit(self, time):
+        # el extractor computa la cantidad de observaciones a partir de los tiempos registrados
+        count = len(time)
+
+        # finalmente, devuelve un diccionario con las caracteríticas calculadas
+        return {"Count": count}
+\end{minted}
+\caption{
+    Extractor que computa la cantidad de observaciones en una serie temporal.
+}
+\label{code:extractor}
+\end{code}
+
+\begin{description}[resume]
+    \item[Selección flexible de características]
+    La herramienta provee una \gls{api} para la selección de varias características antes de su extracción. La clase \texttt{feets.FeatureSpace}, por defecto, calcula todas las características disponibles a la vez, pero puede ser instanciada con distintos parámetros de selección para determinar las características a computar.
+
+    Como se mencionó anteriormente, las características se dividen según los vectores de datos necesarios para su extracción (\texttt{magnitude}, \texttt{time}, \texttt{error}, \texttt{magnitude2}, entre otros). Si el usuario no cuenta con todos estos datos, puede especificar el parámetro \texttt{data} con los vectores disponibles. Luego, la herramienta se encarga de seleccionar solo las características válidas bajo ese dominio de entradas. En caso de no especificar ningún dato, se seleccionan automáticamente todas las características.
+
+    En lugar de extraer todas las características disponibles, el usuario puede decidir pasar el parámetro \texttt{only} con una lista de las características específicas que desea calcular. Similarmente, también puede excluir características de la selección mediante el parámetro \texttt{exclude}.
+
+    \item[Limpieza y preprocesamiento de datos]
+    Se incluyen dos utilidades para el preprocesamiento de datos de \glspl{lc}.
+    La primera es la función \texttt{remove\_noise()} del módulo \texttt{feets.preprocess} que elimina los puntos de ``ruido'' en una \gls{lc}, es decir, aquellos que se encuentren a cinco desviaciones estándar de la media.
+    La otra función del mismo módulo, \texttt{align()}, sincroniza dos \glspl{lc} en bandas observacionales distintas y obtiene los datos alineados (\texttt{aligned\_time}, \texttt{aligned\_magnitude}, \texttt{aligned\_magnitude2}, \texttt{a\-ligned\_e\-rror} y \texttt{a\-ligned\_e\-rror2}).
+
+    
+    \item[Lector de catálogos astronómicos]
+    La biblioteca se integra con los relevamientos astronómicos \gls{ogle} \citep{soszynski2013ogle} y \gls{macho} \citep{alcock2001macho}. Incorpora funciones para descargar e interpretar los datos de los catálogos provenientes de estos proyectos. 
+
+    \item[Generación de curvas de luz]
+    Se incluye la capacidad de generar \glspl{lc} aleatorias. Hace posible la creación de \glspl{lc} con datos que sigan, por ejemplo, una distribución normal o uniforme. También permite generar \glspl{lc} con patrones de periodicidad específicos.
+
+    \item[Documentación extensa]
+    La documentación de \gls{feets} es completa y detallada. Incluye descripciones para los distintos módulos, clases y métodos del sistema, ayudando al entendimiento del código fuente de la biblioteca.
+    También cuenta con un tutorial que resume la herramienta y explica sus distintas funcionalidades, con ejemplos prácticos y fáciles de entender.
+\end{description}
+
+\section{Arquitectura}
+
+La estructura de \gls{feets} está dividida en cuatro módulos principales:
+
+\begin{description}
+    \item[\texttt{feets.core}] Provee la \gls{api} principal del sistema, el \texttt{FeatureSpace}. Mediante esta clase, el usuario puede elegir las características a computar o seleccionarlas a partir de los vectores de datos disponibles.
+
+    En base a las características seleccionadas, el \texttt{FeatureSpace} se encarga de inicializar, parametrizar y orquestar la ejecución de los extractores en el orden necesario, asegurándose de que se cumplan las dependencias establecidas entre los distintos extractores.
+
+    \item[\texttt{feets.extractors}] Módulo que implementa la lógica de los extractores de características y las herramientas para crear extractores propios. Contiene a la clase \texttt{Extractor}, que constituye la base de todos los extractores.
+    
+    El módulo cuenta también con un registro de todos los extractores y características disponibles en el sistema. El registro se asegura de que cada característica es extraída por su propia clase, y que cada extractor puede computar al menos una característica.
+    
+    El proceso para crear un nuevo extractor de características involucra crear una clase que herede de \texttt{Extractor}. Esta clase, además de implementar la lógica de extracción, debe incluir atributos que definan tanto las características generadas como los vectores de datos requeridos para la computación. Para hacer visible esta nueva clase al resto de la librería hay que agregarla al registro mediante la función \texttt{register\_extractor()}.
+
+    \item[\texttt{feets.preprocess}] Proporciona funciones de limpieza y de preprocesamiento para los datos de series temporales. Las funciones \texttt{remove\_noise()} y \texttt{align()} mencionadas anteriormente pertenecen a este módulo.
+
+    \item[\texttt{feets.datasets}] Provee una interfaz con funcionalidades básicas para la recuperación de catálogos. En particular, incluye implementaciones para la integración con los relevamientos astronómicos \gls{macho} y \gls{ogle}, pero puede extenderse a otros proyectos. Este módulo también incorpora funciones para la generación de \glspl{lc} con datos aleatorios.
+\end{description}
+
+Es importante resaltar la división entre la funcionalidad de análisis y la de creación de extractores de características. Esta separación simplifica la operación del sistema y posibilita la implementación de extractores complejos.
+
+\section{Limitaciones}
+
+A pesar de sus funcionalidades, identificamos algunas limitaciones en la implementación actual de \gls{feets} que pueden afectar su uso en algunos escenarios:
+
+\begin{description}
+ \item[Ejecución secuencial de los extractores]
+    El algoritmo de extracción modelado por \gls{feets} sigue un modelo de planificación secuencial. Esto significa que, dada una selección de extractores, el programa empieza por ejecutar alguno de ellos y, una vez completada la ejecución, procede con el cálculo del siguiente. Luego de finalizar el segundo extractor se pasa al tercero; y así sucesivamente hasta haber pasado por todos los extractores.
+    
+    Si bien este algoritmo cumple con su cometido, es fácil notar que el tiempo de ejecución de todo el procedimiento aumenta linealmente con la cantidad de extractores utilizados. Esto supone un cuello de botella significativo cuando se trabaja con varios extractores a la vez, lo que puede volverse una limitación importante en contextos donde se analizan miles de \glspl{lc}.
+    
+    Si bien los extractores de \gls{feets} pueden presentar dependencias entre sí, en la práctica la mayoría de estos son capaces de operar de manera completamente autónoma. El modelo secuencial, entonces, podría reemplazarse por un algoritmo más inteligente que realice una ejecución en simultáneo de los extractores, de lo posible. Tal enfoque no solo aprovecharía mejor los recursos del sistema, si no que puede reducir significativamente los tiempos de ejecución al trabajar con grandes volúmenes de datos.
+
+    \item[Configuración limitada del \texttt{FeatureSpace}] 
+    La interfaz de \texttt{FeatureSpace} no comprende el procesamiento de varias \glspl{lc} en simultáneo dentro de una misma ejecución. Esto presenta una desventaja en análisis que requieran la comparación en tiempo real de diferentes fuentes de datos, en donde se trabaja con múltiples \glspl{lc} de las cuales se buscan extraer las mismas características.
+
+    Sumado a esto, en el mismo \texttt{FeatureSpace} no es posible instanciar un extractor con diferentes parámetros. Esto significa que si un usuario desea calcular una métrica con distintas configuraciones, debe crear múltiples instancias de \texttt{FeatureSpace} separadas, o que puede resultar en una mayor carga computacional y en una estructura de código más compleja de mantener. Esta limitación impide realizar experimentos de sensibilidad sobre los parámetros de los extractores de manera eficiente.
+
+    \item[Uso de metaclases en lugar de clases abstractas]
+    En Python, todo es un objeto, incluyendo las mismas clases: así como un objeto es una instancia de una clase, una clase es una instancia de lo que se conoce como una metaclase \citep{python2025python}. Las metaclases permiten modificar el comportamiento de las clases en el momento de su creación, sin embargo, un gran poder conlleva una gran responsabilidad. Las metaclases pueden generar comportamientos inesperados en sus instancias, dificultando el \emph{debugging} y \emph{testing}. Sumado a esto, la utilización de metaclases suele seguirse del uso de técnicas avanzadas de metaprogramación que reducen la legibilidad del código y complican aún más su mantenimiento.
+
+    En el caso de \gls{feets}, la creación de las clases de extractores se hace a partir de la metaclase \texttt{Extractor}, la cual valida que se implemente el método de extracción necesario y que las definiciones de los atributos sean correctas. Estas restricciones establecen un contrato común, que le permite a la herramienta y al usuario poder hacer suposiciones sobre el comportamiento de los extractores.
+
+    El contrato establecido por la metaclase \texttt{Extractor} puede implementarse de una manera más simple reemplazando el uso de una metaclase por el de una clase abstracta. Esto es, una clase especial que no puede ser instanciada directamente, sino que establece una interfaz común para sus subclases. En Python, las clases abstractas se implementan utilizando el módulo \texttt{abc}, que permite declarar métodos abstractos sin necesidad de recurrir a la metaprogramación. Este enfoque simplificaría el código y mejoraría su legibilidad, evitando la complejidad adicional de las metaclases y haciendo que las reglas de validación sean más explícitas.
+
+    \item[Persistencia de las configuraciones]
+    Una funcionalidad faltante de \gls{feets} es la de un mecanismo para guardar y reutilizar la configuración de un \texttt{Fea\-ture\-Space}. Esto significa que los usuarios deben reconfigurar manualmente sus selecciones de características cada vez que ejecutan el programa, lo que puede ser poco práctico en flujos de trabajo repetitivos. 
+    
+    En escenarios donde se requiere ejecutar análisis con configuraciones predefinidas, la ausencia de una funcionalidad de persistencia obliga a los usuarios a implementar soluciones externas, como la escritura manual de archivos de configuración o el uso de bases de datos. La inclusión de una funcionalidad que permita la serialización y deserialización de configuraciones de \texttt{FeatureSpace} mejoraría significativamente la usabilidad de la heramienta y permitiría una integración más sencilla con otros sistemas de procesamiento de datos.
+
+    \item[Mantenimiento de versiones obsoletas]
+    Si bien \gls{feets} es compatible con la versión 3 de Python, aún mantiene soporte para Python 2, versión oficialmente descontinuada desde enero de 2020\footnote{\url{https://devguide.python.org/versions/}}.
+    
+    La necesidad de garantizar que el código funcione en una versión obsoleta del lenguaje impide la adopción de funcionalidades más modernas y de optimizaciones introducidas en versiones más recientes. Esto significa, además, que ciertas dependencias de \gls{feets} deben permanecer desactualizadas, dando lugar a problemas de seguridad y estabilidad a largo plazo.
+\end{description}
+
+A la luz de todas estas limitaciones, han surgido nuevas herramientas que buscan abordar algunas de  estas problemáticas. En particular, destacamos a \emph{LightCurve} \citep{malanchev2021lightcurve}, otra herramienta destinada a la extracción de características de \acrlongplsp{lc}. Su implementación en Rust\footnote{\url{https://www.rust-lang.org/}}, capaz de ejecutar varios extractores en paralelo de forma eficiente, le otorga una ventaja significativa en términos de velocidad y de eficiencia en el uso de memoria, ideal para cargas de trabajo intensivas. Sumado a esto, \emph{LightCurve} ofrece nuevos extractores que no están disponibles en \gls{feets}, compatibles con mediciones de flujo entre los vectores de datos soportados.
+
+
+El propósito de este trabajo es presentar una nueva versión de \gls{feets}, orientada a modernizar por completo la biblioteca y a resolver la mayor parte de las limitaciones identificadas en su implementación actual. Esta actualización busca optimizar la ejecución de los extractores mediante un modelo paralelo, mejorar la gestión y reproducibilidad de configuraciones, simplificar la creación y el diseño de los extractores, entre otras mejoras. Se optó por continuar sobre \gls{feets} en lugar de migrar a herramientas alternativas como \emph{LightCurve} con el objetivo de mantener la visión original del proyecto: ofrecer una herramienta centralizada y versátil para el análisis completo de series temporales, que no se limite exclusivamente a \acrlongplsp{lc} ni a la extracción de características, sino que también potencie el análisis y la interpretación de los resultados obtenidos. De esta manera, la nueva versión de \gls{feets} busca combinar modernización tecnológica con la preservación de su enfoque integral y flexible para distintos flujos de trabajo.

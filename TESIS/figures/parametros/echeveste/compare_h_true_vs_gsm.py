@@ -257,7 +257,9 @@ def main():
         ax.set_title(info['label'], fontsize=11, fontweight='bold', loc='left')
         ax.grid(True, alpha=0.3)
         ax.set_ylim(y_lims)  # Rango Y consistente
-        ax.legend(loc='upper right', fontsize=7)
+        # Solo mostrar leyenda en el último subplot
+        if i == len(plot_data) - 1:
+            ax.legend(loc='upper right', fontsize=7)
 
         # Estadísticas de comparación
         stats_text = (

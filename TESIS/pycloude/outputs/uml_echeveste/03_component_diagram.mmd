@@ -1,0 +1,72 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#fff8e1', 'primaryTextColor': '#e65100', 'primaryBorderColor': '#ff9800', 'lineColor': '#ff9800'}}}%%
+
+flowchart TB
+    subgraph SKNEUROMSI["scikit-neuromsi"]
+        direction TB
+
+        subgraph CORE["core/"]
+            SKNMSIMethodABC["SKNMSIMethodABC\n(Clase base abstracta)"]
+            NDResult["NDResult\n(Contenedor de resultados)"]
+        end
+
+        subgraph NEURAL["neural/"]
+            direction TB
+            Echeveste2020["_echeveste2020.py\n━━━━━━━━━━━━━━━━\n• SSNIntegrator (dataclass)\n• Echeveste2020 (clase principal)\n━━━━━━━━━━━━━━━━\nSimulación y entrenamiento SSN"]
+
+            EchevesteTraining["_echeveste_training.py\n━━━━━━━━━━━━━━━━\n• compute_nonlinear_moments()\n• evolve_moments() [ADF]\n• compute_cost_components()\n• create_objective_function()\n• simulate_ssn_with_noise()\n━━━━━━━━━━━━━━━━\nFunciones JAX para training"]
+
+            EchevesteVis["_echeveste_visualization.py\n━━━━━━━━━━━━━━━━\n• plot_membrane_potentials()\n• plot_firing_rates()\n• plot_power_spectrum()\n• plot_autocorrelation()\n• plot_fano_factor()\n• plot_heatmap_activity()\n━━━━━━━━━━━━━━━━\nVisualización de dinámicas"]
+
+            DeviceConfig["_device_config.py\n━━━━━━━━━━━━━━━━\nConfiguración GPU/CPU"]
+        end
+
+        subgraph GENERATIVE["generative/"]
+            GSM["_gsm.py\n━━━━━━━━━━━━━━━━\n• GSM (clase)\n• generate_gabor_filters()\n• generate_covariance_matrix()\n• create_echeveste_gsm()\n━━━━━━━━━━━━━━━━\nModelo Generativo GSM"]
+        end
+
+        subgraph DATA["data/"]
+            EchevesteLoader["echeveste_data_loader.py\n━━━━━━━━━━━━━━━━\n• EchevesteDataLoader\n━━━━━━━━━━━━━━━━\nCarga parámetros SSN\npreentrenados"]
+
+            GSMLoader["gsm_data_loader.py\n━━━━━━━━━━━━━━━━\n• GSMDataLoader\n━━━━━━━━━━━━━━━━\nCarga filtros Gabor,\ncovarianza, estímulos"]
+
+            subgraph DATAFILES["Archivos de datos"]
+                EchevesteData["echeveste2020/\n• w_learn, sigma_eta_learn\n• input_scaling, input_baseline\n• h_true_*, target_*"]
+                GSMData["gsm/\n• A, C\n• x_*, h_*\n• z_array"]
+            end
+        end
+    end
+
+    subgraph EXTERNAL["Dependencias Externas"]
+        JAX["JAX\n(Autodiff + JIT)"]
+        BrainPy["BrainPy\n(Integración ODE)"]
+        NumPy["NumPy"]
+        SciPy["SciPy\n(L-BFGS-B optimizer)"]
+        Matplotlib["Matplotlib\n(Visualización)"]
+    end
+
+    %% Relaciones principales
+    SKNMSIMethodABC --> Echeveste2020
+    Echeveste2020 --> NDResult
+
+    Echeveste2020 --> EchevesteTraining
+    Echeveste2020 --> EchevesteLoader
+    Echeveste2020 --> GSM
+    Echeveste2020 --> DeviceConfig
+    Echeveste2020 -.-> EchevesteVis
+
+    GSM --> GSMLoader
+    EchevesteLoader --> EchevesteData
+    GSMLoader --> GSMData
+
+    EchevesteTraining --> JAX
+    Echeveste2020 --> BrainPy
+    EchevesteTraining --> SciPy
+    EchevesteVis --> Matplotlib
+
+    %% Estilos
+    style SKNEUROMSI fill:#f5f5f5,stroke:#333,stroke-width:2px
+    style CORE fill:#e3f2fd,stroke:#1976d2
+    style NEURAL fill:#e8f5e9,stroke:#388e3c
+    style GENERATIVE fill:#fff3e0,stroke:#f57c00
+    style DATA fill:#fce4ec,stroke:#c2185b
+    style EXTERNAL fill:#eeeeee,stroke:#757575

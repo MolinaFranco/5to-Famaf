@@ -1,0 +1,26 @@
+Simulación Echeveste2020 - Estímulos Angostos
+============================================================
+
+Fecha: 2025-11-28 13:33:24
+
+Parámetros de estímulo:
+  Tipo: Generated (no h_true)
+  width_factor: 0.01
+  amplitude: 7.7341
+  dominant_idx: 25
+  h_max: 1.1111
+
+Parámetros de simulación:
+  Contraste: 0.125
+  Ruido: 0.05
+  Neuronas: 50E + 50I
+  Tiempo: 1000.0 ms
+  dt: 0.2 ms
+  Burn-in: 200.0 ms
+
+Estadísticas (estado estacionario):
+  u_E mean: 3.335422
+  r_E mean: 4.900421
+
+Generado con estímulos angostos (width_factor=0.01)
+Amplitudes calibradas para h_max = h_true original

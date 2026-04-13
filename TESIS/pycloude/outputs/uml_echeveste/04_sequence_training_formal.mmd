@@ -1,0 +1,87 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'actorLineColor': '#424242', 'signalColor': '#424242', 'actorBkg': '#f5f5f5', 'actorBorder': '#616161', 'noteBkgColor': '#fafafa', 'noteBorderColor': '#9e9e9e'}}}%%
+
+sequenceDiagram
+    autonumber
+    participant U as Usuario
+    participant SSN as Echeveste2020
+    participant GSM as GSM
+    participant S1 as Stage 1 ADAM
+    participant S2 as Stage 2 L-BFGS-B
+    participant DL as DataLoader
+
+    Note over U,DL: Procedimiento de entrenamiento del modelo SSN
+
+    rect rgb(245, 245, 245)
+        Note over U,SSN: Fase 1: Inicializacion
+        U->>SSN: __init__(N_E, N_I, tau_e, tau_i)
+        SSN->>SSN: Crear SSNIntegrator
+        SSN->>SSN: Inicializar parametros
+    end
+
+    rect rgb(238, 238, 238)
+        Note over U,DL: Alternativa A: Cargar parametros preentrenados
+        U->>SSN: load_parameters()
+        SSN->>DL: load_ssn_connectivity_parameters()
+        DL-->>SSN: Parametros de conectividad
+        SSN->>DL: load_connectivity_matrix()
+        DL-->>SSN: Matriz W (100x100)
+        SSN->>DL: load_noise_covariance()
+        DL-->>SSN: Matriz Sigma_eta
+        SSN->>SSN: is_trained = True
+    end
+
+    rect rgb(230, 230, 230)
+        Note over U,S2: Alternativa B: Entrenamiento completo
+
+        U->>SSN: train(gsm_model, params)
+
+        rect rgb(224, 224, 224)
+            Note over SSN,S1: Stage 1: Optimizacion estocastica (ADAM)
+            SSN->>GSM: generate_stimulus_patch(contrast)
+            GSM-->>SSN: Estimulo x, latentes y, contraste z
+            SSN->>GSM: generate_h_input_raw(x)
+            GSM-->>SSN: Vector h sin transformar
+
+            SSN->>S1: optimize_stage1(params)
+            Note over S1: N_trial = 50 muestras/iteracion
+            Note over S1: 250 iteraciones ADAM
+            Note over S1: Annealing temporal
+
+            loop Iteraciones ADAM
+                S1->>S1: simulate_ssn_with_noise()
+                S1->>S1: compute_costs_with_samples()
+                S1->>S1: Actualizar gradientes
+            end
+
+            S1-->>SSN: Parametros Stage 1
+            SSN->>SSN: stage1_completed = True
+        end
+
+        rect rgb(218, 218, 218)
+            Note over SSN,S2: Stage 2: Optimizacion deterministica (L-BFGS-B + ADF)
+            SSN->>S2: optimize_stage2(params)
+            Note over S2: Ventana fija T_max - 50ms
+            Note over S2: Evolucion de momentos mu, Sigma
+
+            loop Evaluaciones L-BFGS-B
+                S2->>S2: evolve_moments(W, h, Sigma_eta)
+                S2->>S2: compute_cost_components()
+                S2->>S2: Calcular gradientes JAX
+            end
+
+            S2-->>SSN: Parametros finales
+            SSN->>SSN: stage2_completed = True
+        end
+
+        SSN->>SSN: is_trained = True
+        SSN-->>U: Modelo entrenado
+    end
+
+    rect rgb(250, 250, 250)
+        Note over U,SSN: Fase 3: Simulacion
+        U->>SSN: run(stimulus_contrast, orientation)
+        SSN->>GSM: generate_h_input_efficient(x)
+        GSM-->>SSN: Vector h transformado
+        SSN->>SSN: Integrar dinamica SSN
+        SSN-->>U: NDResult
+    end

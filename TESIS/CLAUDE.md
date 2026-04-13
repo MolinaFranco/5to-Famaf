@@ -145,3 +145,15 @@ Before finalizing any multi-panel figure, verify:
 - Ideal Observer: Y-axis 0-0.07 mV
 - Network: Y-axis 0-7 mV
 - (Makes direct visual comparison impossible; should use same scale)
+
+# Final Work of Carrer (TFC) Development
+- with all our work we have to write a paper in /TFC/TFC_Franco__Mateo__Molina
+- we have to use mathematical and formal lenguage in spanish
+- its so important that you base your rigting in others papers
+- you have to use a los of conectors of sentences
+- **it so importatn that you never do a circular righting** this is when you talk  about a topic and then after a while you go back to talk about the same thing.
+- you have other TFC in /TFC/Tesisna_feets **it soo important that you studie that to base your work in this**
+- you have to bee so academic and profesional but dont apear a robot meybe a joke could be a good option
+- **IT IS EXTREMELY IMPORTANT TO EXPLAIN WHERE YOU GET ALL THE INFORMATION YOU GET FROM.**
+- You can find a lot of information on Wikipedia; it's especially important for explaining historical contexts.
+- It has to be like a story that follows a line and tells you how things happened over time.

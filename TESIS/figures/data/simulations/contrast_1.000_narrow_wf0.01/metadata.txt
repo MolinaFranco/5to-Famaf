@@ -1,0 +1,4 @@
+Simulación Echeveste2020 - Estímulos Angostos
+Contraste 1.0 (very_high)
+h_max: 58.9473
+noise_level: 0.05

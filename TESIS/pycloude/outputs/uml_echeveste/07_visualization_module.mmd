@@ -1,0 +1,83 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#fce4ec', 'primaryTextColor': '#880e4f'}}}%%
+
+classDiagram
+    direction TB
+
+    class EchevesteVisualization {
+        <<module: _echeveste_visualization.py>>
+
+        ~~Helper Functions~~
+        +_extract_mode_data(result, mode_name)$ ndarray
+        +_get_stimulus_info(result)$ dict
+        +_add_stimulus_overlay(ax, result, alpha, color, ...)$
+
+        ~~Membrane Potential Plots~~
+        +plot_membrane_potentials(result, neurons, figsize, ...)$ Figure
+        %% Potenciales u_E, u_I vs tiempo
+
+        ~~Firing Rate Plots~~
+        +plot_firing_rates(result, neurons, figsize, ...)$ Figure
+        %% Tasas r = k·[u]₊² vs tiempo
+
+        +plot_mean_firing_rates(result, figsize, ...)$ Figure
+        %% Promedio poblacional de tasas
+
+        ~~Population Activity~~
+        +plot_population_activity(result, figsize, ...)$ Figure
+        %% Actividad total E vs I
+
+        +plot_heatmap_activity(result, population, figsize, ...)$ Figure
+        %% Heatmap: neuronas × tiempo
+
+        ~~Temporal Analysis~~
+        +plot_autocorrelation(result, max_lag, figsize, ...)$ Figure
+        %% Autocorrelación temporal
+
+        +plot_power_spectrum(result, figsize, ...)$ Figure
+        %% Espectro de potencia (oscilaciones gamma)
+
+        ~~Statistical Analysis~~
+        +plot_transient_analysis(result, window_size, figsize, ...)$ Figure
+        %% Análisis de transitorios
+
+        +plot_fano_factor(result, window_sizes, figsize, ...)$ Figure
+        %% Factor de Fano vs ventana temporal
+
+        ~~Spatial Sampling~~
+        +plot_spatial_sampling(result, n_samples, figsize, ...)$ Figure
+        %% Muestreo espacial del posterior
+
+        ~~Summary Plots~~
+        +plot_neural_dynamics_summary(result, figsize)$ Figure
+        %% Panel completo de dinámicas
+
+        +plot_all_dynamics(result, output_dir, save_figures, ...)$
+        %% Genera y guarda todas las figuras
+    }
+
+    class NDResult {
+        <<input>>
+        +times_: ndarray
+        +positions_: ndarray
+        +extra_: dict
+        +get_modes() DataFrame
+    }
+
+    class Matplotlib {
+        <<external>>
+        +pyplot
+        +Figure
+        +Axes
+    }
+
+    class SciPy {
+        <<external>>
+        +signal.correlate()
+        +signal.welch()
+    }
+
+    NDResult --> EchevesteVisualization : input
+    EchevesteVisualization --> Matplotlib : uses
+    EchevesteVisualization --> SciPy : uses for spectral analysis
+
+    note for EchevesteVisualization "Visualización de dinámicas SSN\nBasado en Figuras 2-7 del paper"

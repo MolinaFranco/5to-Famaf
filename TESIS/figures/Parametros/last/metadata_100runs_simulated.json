@@ -1,0 +1,23 @@
+{
+  "n_runs_simulated": 100,
+  "n_runs_real_source": 6,
+  "simulated": true,
+  "note": "Datos simulados para visualizaci\u00f3n, NO son entrenamientos reales",
+  "echeveste_reference": {
+    "a_EE": 0.3310891688967093,
+    "a_EI": 0.08130717173899779,
+    "a_IE": 0.3632145609560818,
+    "a_II": 0.07359533734448401,
+    "d_EE": 0.802756367925039,
+    "d_EI": 0.5687305957043637,
+    "d_IE": 0.8598284256512554,
+    "d_II": 0.6298048831304652,
+    "input_scaling": 1.9555172652455068,
+    "input_baseline": 0.10323289338023067,
+    "input_nl_pow": 2.0342696175657102,
+    "sigma_eta_width": 0.4779526450324252,
+    "sigma_eta_std_e": 6.3991867205508095,
+    "sigma_eta_std_i": 3.5335140149460087,
+    "sigma_eta_rho": 0.9928524188775745
+  }
+}

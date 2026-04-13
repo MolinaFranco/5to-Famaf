@@ -1,0 +1,30 @@
+VALIDACION MASIVA - 2026-01-27 02:48:49.167125
+N_SAMPLES = 10000
+======================================================================
+
+f1 (PDF Normal): PASS
+  Max |error|: 0.00e+00
+f2_exact (CDF Normal): PASS
+  Max |error|: 0.00e+00
+Activacion Supralineal: PASS
+  Max |error|: 0.00e+00
+Derivada Activacion: PASS
+  Max |error|: 0.00e+00
+Momentos nu (n=2): PASS
+  Max |error|: 7.11e-15
+Evolucion Membrana: PASS
+  Max |error|: 0.00e+00
+Calculo gamma: PASS
+  Max |error|: 0.00e+00
+Matriz Jacobiana J: PASS
+  Max |error|: 0.00e+00
+GSM Sigma Posterior: PASS
+  Max |error|: 0.00e+00
+GSM mu Posterior: PASS
+  Max |error|: 0.00e+00
+Constantes O-U: PASS
+Conectividad Parametrica: PASS
+  Max |error|: 0.00e+00
+
+======================================================================
+Total: 12/12 pasados

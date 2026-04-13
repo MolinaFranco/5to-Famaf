@@ -1,0 +1,22 @@
+Simulación Echeveste2020 - Tres Fases Temporales
+============================================================
+
+Fecha: 2026-02-03 20:13:48
+
+Estructura temporal:
+  Fase 1 (Pre-estímulo):  250 ms
+  Fase 2 (Estímulo):      500 ms
+  Fase 3 (Post-estímulo): 250 ms
+  Total:                  1000 ms
+
+Parámetros de estímulo:
+  Contraste: 1.0
+  width_factor: 0.01
+  amplitude: 61.8572
+  h_max: 58.9473
+
+Parámetros de simulación:
+  Ruido: 0.05
+  Neuronas: 50E + 50I
+  dt: 0.2 ms
+  Burn-in: 500.0 ms

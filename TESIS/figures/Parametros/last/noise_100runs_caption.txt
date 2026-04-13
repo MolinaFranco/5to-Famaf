@@ -1,0 +1,20 @@
+Figure caption (noise_100runs.png):
+
+Noise covariance parameters across 100 training runs compared to
+Echeveste et al. (2020) reference values. Red dashed lines indicate
+the original optimized values from Table S1, with shaded regions
+representing ±10% tolerance bands.
+
+Y-axis scales rationale:
+- d_η (spatial width): Scale [0, 1] represents the normalized fraction
+  of the orientation space over which noise correlations extend.
+- σ_E and σ_I (excitatory/inhibitory standard deviations): Both use
+  scale [0, 10] mV to enable direct visual comparison between
+  excitatory and inhibitory noise magnitudes.
+- ρ (E-I correlation): Scale [0, 1] as this is a dimensionless
+  correlation coefficient bounded by definition.
+
+Reference: Echeveste, R., Aitchison, L., Hennequin, G., & Lengyel, M.
+(2020). Cortical-like dynamics in recurrent circuits optimized for
+sampling-based probabilistic inference. Nature Neuroscience, 23(9),
+1138-1149. Table S1.
