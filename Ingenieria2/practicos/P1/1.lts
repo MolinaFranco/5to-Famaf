@@ -1,0 +1,8 @@
+MEETING = (hello -> converse -> godbye -> STOP).
+JOB = (arrive -> work -> leave -> JOB).
+GAME = (tree -> lose -> GAME 
+		|{one, two} -> win -> GAME). 
+FOURTICK = (tick -> tick -> tick -> STOP).
+DOUBLE = (in[i:1..3] -> out[i] -> DOUBLE).
+PERSON = (weekend -> sleep -> work -> PERSON
+			|weekend -> sleep -> {play, shop} -> PERSON).

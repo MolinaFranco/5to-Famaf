@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>org.alloytools.alloy.desktop</id>
+
+    <name>Alloy</name>
+    <summary></summary>
+
+    <metadata_license>FSFAP</metadata_license>
+    <project_license>MIT</project_license>
+
+    <description>
+    <p>
+    
+    </p>
+    </description>
+
+    <launchable type="desktop-id">org.alloytools.alloy.desktop</launchable>
+
+    <provides>
+      <binary>alloy</binary>
+    </provides>
+
+    <releases>
+      <release version="6.2.0" date="2021-01-01">
+        <description>
+          <p><!-- This is meant to hold release notes. --></p>
+        </description>
+      </release>
+    </releases>
+</component>

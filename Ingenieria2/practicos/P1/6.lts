@@ -1,0 +1,26 @@
+//Considere un sensor que mide el nivel de agua de un tanque. El nivel, que inicialmente
+//es 5, se mide en unidades de 0 a 9. El sensor emite una se˜nal de bajo si el nivel es menor que 2 y una
+//se˜nal de alto si el nivel es mayor a 8. En cualquier otro caso, el sensor emite la se˜nal normal. Modele
+//el sensor como un proceso FSP.
+
+//SENSOR = NORMAL,
+//NORMAL = (lectura[i:0..2] -> bajo -> BAJO
+//		| lectura[i:3..7] -> normal -> NORMAL
+//		| lectura[i:8..9] -> alto -> ALTO),
+//BAJO = (lectura[i:0..2] -> bajo -> BAJO
+//		| lectura[i:3..7] -> normal -> NORMAL
+//		| lectura[i:8..9] -> alto -> ALTO),
+//ALTO = (lectura[i:0..2] -> bajo -> BAJO
+//		| lectura[i:3..7] -> normal -> NORMAL
+//		| lectura[i:8..9] -> alto -> ALTO).
+
+range I = 0..9
+SENSOR = SENSOR[5],
+SENSOR[i:I] = ( lectura[j:I] ->
+    (when (0<=j && j<2) bajo -> SENSOR[j] 
+    | when (2<=j && j<8) normal -> SENSOR[j] 
+    | when (8<=j && j<=9) alto -> SENSOR[j] 
+)).
+//25
+TEST = (lectura[1] -> bajo -> lectura[9] -> alto -> lectura[3] -> normal -> STOP).
+||SENSORFINAL = (SENSOR || TEST).

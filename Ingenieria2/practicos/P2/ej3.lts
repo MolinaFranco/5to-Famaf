@@ -1,0 +1,38 @@
+const N = 1 //cantidad de asientos
+range A = 1..N
+
+COMPUTADORA = (
+    recibir_consultar -> (ocupado -> COMPUTADORA | libre -> COMPUTADORA) 
+    | solicitud_reserva -> COMPUTADORA
+    | cancelacion_asiento -> COMPUTADORA
+).
+
+ASIENTO = ASIENTO[0],
+ASIENTO[i:0..1] = (
+    when i==0 reservar -> ASIENTO[1]
+    |when i==1 cancelar -> ASIENTO[0]
+    |consulta -> (when i==1 ocupado -> ASIENTO[i] 
+                 |when i==0 libre -> ASIENTO[i])
+).
+
+TERMINAL = (
+    consultar[i:A] -> (libre -> TERMINAL | ocupado -> TERMINAL ) 
+    |reservar[i:A] -> TERMINAL
+    |cancelar[i:A] -> TERMINAL
+).
+
+||TEATRO = (
+    term:TERMINAL
+    || asi[A]:ASIENTO
+    || comp:COMPUTADORA
+)/{
+    consultar[t:A]/{term.consultar[t], comp.recibir_consultar, asi[t].consulta},
+    reservar[t:A]/{term.reservar[t], comp.solicitud_reserva, asi[t].reservar},
+    cancelar[t:A]/{term.cancelar[t], comp.cancelacion_asiento, asi[t].cancelar},
+    libre[t:A]/{term.libre, comp.libre, asi[t].libre},
+    ocupado[t:A]/{term.ocupado, comp.ocupado, asi[t].ocupado}
+}.
+
+
+// NO SE PUEDE SERVAR MAS DE UNA VEZ EL MISMO ASIENTO
+

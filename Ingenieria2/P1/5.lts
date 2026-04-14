@@ -1,5 +1,0 @@
-BISTABLE = UNO,
-CERO = (trigger ->  UNO),
-UNO = (trigger -> CERO).
-
-TRAZA = (trigger -> [0] -> trigger -> [1] -> TRAZA).

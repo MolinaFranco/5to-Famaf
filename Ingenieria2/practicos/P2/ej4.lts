@@ -1,0 +1,36 @@
+// The Dining Savages: Una tribu de salvajes disfruta de una cena comunitaria. Cada uno
+// se sirve de una gran olla que contiene hasta M porciones de estofado de misionero. Cuando un salvaje
+// quiere comer se sirve una porci´on de la olla al menos que esta este vac´ıa en cuyo caso espera hasta
+// que esta se vuelva a llenar. Si la olla se vac´ıa, el cocinero de la tribu la vuelve a llenar con M porciones.
+// Modele los salvajes, el cocinero y la oll
+const P = 2 //porciones
+const S = 2 //salvajes
+
+COCINERO = (servirse -> COCINERO | llenar_olla -> COCINERO).
+SALVAJE = (servirse -> SALVAJE).
+
+OLLA = OLLA[0],
+OLLA[p:0..P] = (
+    when p>0 extraccion -> OLLA[p-1]
+    |when p==0 llenar_olla -> OLLA[P]
+).
+
+||TRIBU = (
+    salvaje[1..S]:SALVAJE
+    ||cocinero:COCINERO
+    ||olla:OLLA
+)/{
+    servir/{salvaje[1..2].servirse, cocinero.servirse, olla.extraccion},
+    // salvaje[1..2].servirse/
+    llenar.olla/{cocinero.llenar_olla, olla.llenar_olla}
+}.
+
+
+// ||ALGO = (OLLA || COCINERO)/{llenar / llenar_olla}\{llenar}.
+
+// ||TRIBU = (
+//     salvaje[1..S]:SALVAJE ||
+//     {salvaje[1..S]}::ALGO
+// )/{
+//     salvaje[1..S].servirse / salvaje[1..S].servir
+// }.

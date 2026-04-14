@@ -1,9 +1,0 @@
-[Desktop Entry]
-Categories=GTK;Gnome;
-Exec=/usr/lib/alloytools/alloy/bin/alloy
-Icon=org.alloytools.alloy
-Name=Alloy
-Terminal=false
-Type=Application
-# Version of the .desktop spec this file conforms with.
-Version=1.4
